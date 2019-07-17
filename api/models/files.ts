@@ -1,5 +1,10 @@
 import mongoose = require('mongoose');
 
+export interface IFile {
+  name: String,
+  fid: String
+}
+
 const FileSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -12,4 +17,4 @@ const FileSchema = new mongoose.Schema({
   }
 });
 
-module.exports = FileSchema;
+export default FileSchema;

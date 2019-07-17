@@ -74,6 +74,13 @@ export const UserSchema = new mongoose.Schema<IUser>({
     required: true,
     default: enums.Role.NONE
   },
+  
+  // The user's status in platform
+  status : {
+    type: String,
+    required: true,
+    default: enums.Status.PENDING
+  },
 
   // Created timestamp
   createdAt: {
