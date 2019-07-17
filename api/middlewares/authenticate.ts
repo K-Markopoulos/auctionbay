@@ -31,7 +31,7 @@ const authenticate = (req: Request, res: Response, next: any) => {
   if (!payload) {
     return next(new errors.UnauthorizedError());
   }
-  User.findById(payload._id).then((user: IUser) => {
+  return User.findById(payload._id).then((user: IUser) => {
     if (!user) {
       return next(new errors.UnauthorizedError());    
     }

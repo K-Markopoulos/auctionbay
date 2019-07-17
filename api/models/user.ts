@@ -1,9 +1,6 @@
 import mongoose  = require('mongoose');
-import FileSchema = require('./files');
 import enums = require('./enums');
-import bcrypt = require('bcrypt');
-
-const Role = enums.Role;
+import Location from './location';
 
 export interface IUser extends mongoose.Document{
   username: string,
@@ -13,13 +10,15 @@ export interface IUser extends mongoose.Document{
   lastName: string,
   address: string,
   phoneNumber: string,
+  taxId: string,
   role: string,
+  status: string,
   createdAt: Date,
   updatedAt: Date,
   lastLogin: Date,
 }
 
-const UserSchema = new mongoose.Schema<IUser>({
+export const UserSchema = new mongoose.Schema<IUser>({
   
   // The user's username
   username: {
@@ -53,7 +52,7 @@ const UserSchema = new mongoose.Schema<IUser>({
 
   // The address of the user's company
   address: {
-    type: String,
+    type: Location,
     required: true
   },
 
@@ -63,11 +62,17 @@ const UserSchema = new mongoose.Schema<IUser>({
     required: true
   },
 
+  // The user's tax id
+  taxId: {
+    type: String,
+    required: true
+  },
+
   // The user's role
   role: {
     type: String,
     required: true,
-    default: Role.NONE
+    default: enums.Role.NONE
   },
 
   // Created timestamp

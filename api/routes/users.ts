@@ -1,5 +1,6 @@
 import express = require('express');
 import authenticate = require('../middlewares/authenticate');
+import guard = require('../middlewares/guards');
 import respond = require('../middlewares/respond');
 import method = require('../methods/users');
 import prepare = require('../middlewares/prepare');
@@ -9,7 +10,6 @@ const router = express.Router();
 // Get all users
 router.route('/').get(
   authenticate,
-  // authorize,
   prepare(method.getAllUsers),
   respond
 );
@@ -26,13 +26,13 @@ router.route('/authenticate').post(
   respond
 );
 
-// Check username
+// Check for existing username
 router.route('/username').post(
   prepare(method.checkUsername),
   respond
 );
 
-// Check email
+// Check for existing email
 router.route('/email').post(
   prepare(method.checkEmail),
   respond
@@ -41,7 +41,6 @@ router.route('/email').post(
 // Get user by id
 router.route('/:id').get(
   authenticate,
-  // authorize,
   prepare(method.getUser),
   respond
 );
@@ -49,7 +48,7 @@ router.route('/:id').get(
 // Update user by id
 router.route('/:id').post(
   authenticate,
-  // authorize,
+  guard.asSelf,
   prepare(method.updateUser),
   respond
 );
@@ -57,7 +56,7 @@ router.route('/:id').post(
 // Delete user
 router.route('/:id').delete(
   authenticate,
-  // authorize,
+  guard.asSelf,
   prepare(method.deleteUser),
   respond
 );

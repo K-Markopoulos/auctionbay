@@ -1,7 +1,7 @@
-import { Request, Response, RequestHandler} from 'express';
+import { Request, Response, NextFunction} from 'express';
 
 const prepare = (method: Function) => {
-  return (req: Request, res: Response, next: any) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     const input = Object.assign({}, req.params, req.query, req.body);
       return method(input).then((result) => {
         res.locals.content = result;
