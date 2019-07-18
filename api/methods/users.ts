@@ -8,7 +8,7 @@ const _validate = async (user: IUser): Promise<IUser> => {
   if (sameEmailUser) {
     throw new errors.BadRequestError('EMAIL_ALREADY_EXISTS');
   }
-  const sameUsernamelUser = await User.findOne({ email: user.username });
+  const sameUsernamelUser = await User.findOne({ username: user.username });
   if (sameUsernamelUser) {
     throw new errors.BadRequestError('USERNAME_ALREADY_EXISTS');
   }

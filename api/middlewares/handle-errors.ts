@@ -1,7 +1,7 @@
-import { Request, Response, RequestHandler } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 // Handles all errors.
-const handle = (error: Error, req: Request, res: Response, _next: RequestHandler) => {
+const handle = (error: Error, _req: Request, res: Response, _next: NextFunction) => {
   let errorMsg: string = '';
   let status: number;
   switch (error.name) {
@@ -22,6 +22,7 @@ const handle = (error: Error, req: Request, res: Response, _next: RequestHandler
       errorMsg = error.message;
       break;
     default:
+      console.warn(error);
       status = 500;
       errorMsg = 'FAILED';
       break;

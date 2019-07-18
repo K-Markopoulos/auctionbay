@@ -1,6 +1,6 @@
 import mongoose  = require('mongoose');
 import enums = require('./enums');
-import Location from './location';
+import LocationSchema, { ILocation } from './location';
 
 export interface IUser extends mongoose.Document{
   username: string,
@@ -8,7 +8,7 @@ export interface IUser extends mongoose.Document{
   password: string,
   firstName: string,
   lastName: string,
-  address: string,
+  location: ILocation,
   phoneNumber: string,
   taxId: string,
   role: string,
@@ -50,9 +50,9 @@ export const UserSchema = new mongoose.Schema<IUser>({
     required: true
   },
 
-  // The address of the user's company
-  address: {
-    type: Location,
+  // The user's location details
+  location: {
+    type: LocationSchema,
     required: true
   },
 
