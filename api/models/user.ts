@@ -108,4 +108,17 @@ UserSchema.pre<IUser>('save', function(next) {
   return next();
 });
 
+UserSchema.methods.toJSON = function() {
+  return {
+    username: this.username,
+    email: this.email,
+    firstName: this.firstName,
+    lastName: this.lastName,
+    location: this.location,
+    phoneNumber: this.phoneNumber,
+    taxId: this.taxId,
+    role: this.role
+  };
+};
+
 export default mongoose.model<IUser>('User', UserSchema);

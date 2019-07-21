@@ -13,9 +13,9 @@ const asRole = (role: string) => {
     }
     if (user.role !== role) {
       console.warn('The accessor is not authorized');
-      return next(new errors.UnauthorizedError());
+      return next(new errors.ForbiddenError());
     }
-    return true;
+    return next();
   };
 };
 
@@ -26,11 +26,11 @@ const asSelf = () => {
       console.warn('The accessor is not authenticated');
       return next(new errors.UnauthorizedError());
     }
-    if (user._id !== req.params.id) {
+    if (!user._id.equals(req.params.id)) {
       console.warn('The accessor is not authorized');
-      return next(new errors.UnauthorizedError());
+      return next(new errors.ForbiddenError());
     }
-    return true;
+    return next();
   };
 };
 
@@ -43,9 +43,9 @@ const asOwner = () => {
     }
     if ((document.seller as IUser)._id !== req.params.id) {
       console.warn('The accessor is not authorized');
-      return next(new errors.UnauthorizedError());
+      return next(new errors.ForbiddenError());
     }
-    return true;
+    return next();
   };
 }
 
@@ -58,9 +58,9 @@ const asAdmin = () => {
     }
     if (user.role !== Enums.Role.ADMINISTRATOR) {
       console.warn('The accessor is not authorized');
-      return next(new errors.UnauthorizedError());
+      return next(new errors.ForbiddenError());
     }
-    return true;
+    next();
   };
 };
 

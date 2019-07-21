@@ -2,6 +2,7 @@ import User, { IUser }from '../models/user';
 import errors = require('../common/errors');
 import bcrypt = require('bcrypt');
 import tokens = require('../common/tokens');
+import enums = require('../models/enums');
 
 const _validate = async (user: IUser): Promise<IUser> => {
   const sameEmailUser = await User.findOne({ email: user.email });
@@ -17,28 +18,50 @@ const _validate = async (user: IUser): Promise<IUser> => {
 
 const getAllUsers = async (input) => {
   const users = await User.find({});
-  return users;
+  return users.map((user: IUser) => user.toJSON);
 };
 
 const createUser = async (input) => {
-  const user = new User(input);
-  return _validate(user).then((user: IUser) => {
-    user.password = bcrypt.hashSync(input.password, 10);
-    console.info('Created new user: ', user.username);
-    return user.save();
-  })
+  const user = await _validate(new User(input));
+  user.password = bcrypt.hashSync(input.password, 10);
+  console.info('Created new user: ', user.username);
+  return (await user.save()).toJSON();
 };
 
 const getUser = async (input) => {
-
+  const user = await User.findById(input.id);
+  return user.toJSON();
 };
 
 const updateUser = async (input) => {
+  const changes = {
+    email: input.email,
+    firstName: input.firstName,
+    lastName: input.lastName,
+    location: input.location,
+    phoneNumber: input.phoneNumber,
+    taxId: input.taxId
+  };
+  Object.keys(changes).forEach(x => {
+    if (!changes[x]) {
+      delete changes[x];
+    }
+  });
+  const user = await User.findByIdAndUpdate(input.id, changes, { new: true });
+  return user.toJSON();
+};
 
+const approveUsers = async (input) => {
+  const res = await User.updateMany(
+    { _id: { $in: input.users }},
+    { status: enums.Status.APPROVED },
+    { multi: true }
+  );
+  return res;
 };
 
 const deleteUser = async (input) => {
-
+  const user = await User.findByIdAndRemove(input.id);
 };
 
 const authenticateUser = async (input) => {
@@ -80,6 +103,7 @@ export = {
   getAllUsers,
   createUser,
   getUser,
+  approveUsers,
   updateUser,
   deleteUser,
   authenticateUser,

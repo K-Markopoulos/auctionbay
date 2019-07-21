@@ -8,6 +8,7 @@
   "scripts": {
     "start": "nodemon --inspect --exec 'node -r dotenv/config' -r ts-node/register server.ts",
     "test": "mocha --exit -r dotenv/config -r ts-node/register api/tests/*.ts",
+    "seed": "node -r dotenv/config -r ts-node/register api/bin/seed.ts",
     "watch": "nodemon",
     "build": "tsc"
   },

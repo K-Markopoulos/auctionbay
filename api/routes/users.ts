@@ -38,6 +38,14 @@ router.route('/email').post(
   respond
 );
 
+// Approve user
+router.route('/approve').post(
+  authenticate,
+  guard.asAdmin(),
+  prepare(method.approveUsers),
+  respond
+);
+
 // Get user by id
 router.route('/:id').get(
   authenticate,
@@ -48,7 +56,7 @@ router.route('/:id').get(
 // Update user by id
 router.route('/:id').post(
   authenticate,
-  guard.asSelf,
+  guard.asSelf(),
   prepare(method.updateUser),
   respond
 );
@@ -56,7 +64,7 @@ router.route('/:id').post(
 // Delete user
 router.route('/:id').delete(
   authenticate,
-  guard.asSelf,
+  guard.asSelf(),
   prepare(method.deleteUser),
   respond
 );

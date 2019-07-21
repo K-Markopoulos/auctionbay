@@ -4,6 +4,8 @@ import server = require('../../server');
 import mongoose = require('mongoose');
 import helpers = require('./helpers');
 import tokens = require('../common/tokens');
+import enums = require('../models/enums');
+import users = require('../methods/users');
 
 const registerData = {
   username: 'user',
@@ -134,22 +136,68 @@ describe('Test users routes', function() {
     });
   });
 
-  describe.skip('GET @ /:id', function () {
+  describe('POST @ /approve', function () {
+    it('should approve all requested users', async () => {
+      const admin = await helpers.createUser({ role: enums.Role.ADMINISTRATOR });
+      const adminToken = tokens.generate({ _id: admin._id });
+      const pending_users = await Promise.all([
+        helpers.createUser({ status: enums.Status.PENDING }),
+        helpers.createUser({ status: enums.Status.PENDING }),
+        helpers.createUser({ status: enums.Status.PENDING }),
+      ]);
+      const data = {
+        users: pending_users.map(x => x._id)
+      };
+      const p = await post(server, '/api/users/approve', data, adminToken);
+
+      p.should.have.status(200);
+      p.body.should.have.property('nModified').equals(3);
+    });
+
+    it('should not approve unkown users', async () => {
+      const admin = await helpers.createUser({ role: enums.Role.ADMINISTRATOR });
+      const adminToken = tokens.generate({ _id: admin._id });
+      const unknown_users = {
+        users: await Array.of(4).map(mongoose.Types.ObjectId)
+      };
+      const p = await post(server, '/api/users/approve', unknown_users, adminToken);
+
+      p.should.have.status(200);
+      p.body.should.have.property('n').equals(0);
+      p.body.should.have.property('nModified').equals(0);
+    });
+
+    it('should not approve users as not admin', async () => {
+      const user = await helpers.createUser();
+      const token = tokens.generate({ _id: user._id });
+      const pending_users = await Promise.all([
+        helpers.createUser({ status: enums.Status.PENDING }),
+        helpers.createUser({ status: enums.Status.PENDING }),
+        helpers.createUser({ status: enums.Status.PENDING }),
+      ]);
+      const data = {
+        users: pending_users.map(x => x._id)
+      };
+      const p = await post(server, '/api/users/approve', data, token);
+
+      p.should.have.status(403);
+    });
+  });
+
+  describe('GET @ /:id', function () {
     it('should get user by id', async () => {
       const user = await helpers.createUser();
       const token = tokens.generate({ _id: user._id });
       const p = await get(server, `/api/users/${user._id}`, token);
-      console.info(p);
 
       p.should.have.status(200);
       p.body.should.have.property('email').equals(user.email);
       p.body.should.have.property('username').equals(user.username);
-        // Object.keys(user-dto).forEach((prop) => p.body.should.have.property(prop));
     });
 
     it('should not get user for unknown accessor', async () => {
       const user = await helpers.createUser();
-      const token = tokens.generate({ _id: faker.random.uuid() });
+      const token = tokens.generate({ _id: mongoose.Types.ObjectId });
       const p = await get(server, `/api/users/${user._id}`, token);
 
       p.should.have.status(401);
@@ -158,20 +206,20 @@ describe('Test users routes', function() {
     it('should not get an unknown user', async () => {
       const user = await helpers.createUser();
       const token = tokens.generate({ _id: user._id });
-      const p = await get(server, `/api/users/${faker.random.uuid()}`, token);
+      const p = await get(server, `/api/users/${mongoose.Types.ObjectId}`, token);
       
       p.should.have.status(404);
     });
   });
 
-  describe.skip('POST @ /:id', function () {
+  describe('POST @ /:id', function () {
     it('should update user by id', async () => {
       const user = await helpers.createUser();
       const token = tokens.generate({ _id: user._id });
       const changes = {
         firstName: 'NewName'
       };
-      const p = await post(server, `/api/users/${user._id}`,changes, token);
+      const p = await post(server, `/api/users/${user._id}`, changes, token);
       
       p.should.have.status(200);
       Object.keys(changes).forEach((prop) => {
@@ -179,7 +227,7 @@ describe('Test users routes', function() {
       });
     });
 
-    it('should update third user', async () => {
+    it('should not update third user', async () => {
       const user1 = await helpers.createUser();
       const user2 = await helpers.createUser();
       const token1 = tokens.generate({ _id: user1._id });
@@ -192,15 +240,18 @@ describe('Test users routes', function() {
     });
   });
 
-  describe.skip('GET @ /', function () {
+  describe('GET @ /', function () {
     it('should get all users', async () => {
-      const users = await Array.of(20).forEach(async () => {
-        await helpers.createUser();
-      })
+      const users = await Promise.all([
+        helpers.createUser(),
+        helpers.createUser(),
+        helpers.createUser(),
+      ]);
       const token = tokens.generate({ _id: users[0]._id });
       const p = await get(server, '/api/users/', token);
 
-      p.should.be.an('array').with.length(20);
+      p.should.have.status(200);
+      p.body.should.be.an('array').with.length(3);
     });
   });
 });

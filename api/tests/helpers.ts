@@ -14,7 +14,7 @@ const createLocation = (overrides?: any) => {
 const createUser = async (overrides?: any) => {
   const details = {
     username: faker.random.word(),
-    email: faker.random.uuid + '@mail.com',
+    email: faker.random.uuid() + '@mail.com',
     password: 'Ultra_secret',
     firstName: faker.name.findName(),
     lastName: faker.name.lastName(),
