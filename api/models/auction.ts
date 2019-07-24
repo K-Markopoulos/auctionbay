@@ -36,11 +36,10 @@ const BidSchema = new mongoose.Schema<IBid>({
 export interface IAuction extends mongoose.Document{
   name: String,
   category: String[],
-  currently: IBid | mongoose.Types.ObjectId,
   buyPrice: Number,
   firstBid: Number,
-  bids: IBid[] | mongoose.Types.ObjectId[],
-  location: IItemLocation | mongoose.Types.ObjectId,
+  bids: IBid[],
+  location: IItemLocation,
   started: Date,
   ends: Date,
   seller: IUser | mongoose.Types.ObjectId,
@@ -61,12 +60,6 @@ const AuctionSchema = new mongoose.Schema<IAuction>({
     type: String,
     required: true
   }],
-
-  // The currenty highest bid
-  currently: {
-    type: BidSchema,
-    required: true
-  },
 
   // The auction's buy price, can be omitted
   buyPrice: {
@@ -94,7 +87,8 @@ const AuctionSchema = new mongoose.Schema<IAuction>({
   // The date the auction started
   started: {
     type: Date,
-    required: true
+    required: true,
+    default: new Date()
   },
 
   // The date the auction ends
@@ -120,5 +114,22 @@ const AuctionSchema = new mongoose.Schema<IAuction>({
     FileSchema
   ]
 });
+
+AuctionSchema.methods.toJSON = function() {
+  return {
+    name: this.name,
+    category: this.category,
+    buyPrice: this.buyPrice,
+    firstBid: this.firstBid,
+    currently: this.bids && this.bids[0],
+    bids: this.bids,
+    location: this.location,
+    started: this.started,
+    ends: this.ends,
+    seller: this.seller,
+    description: this.description,
+    images: this.images || []
+  };
+};
 
 export default mongoose.model<IAuction>('Auction', AuctionSchema);

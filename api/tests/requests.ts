@@ -19,7 +19,16 @@ const post = (app: any, url: string, data?: any, token?: string) => {
   return request.send(data);
 };
 
+const put = (app: any, url: string, data?: any, token?: string) => {
+  const request = chai.request(app).put(url);
+  if (token) {
+    request.set('Authorization', `Bearer ${token}`);
+  }
+  return request.send(data);
+};
+
 export {
   get,
-  post
+  post,
+  put
 }

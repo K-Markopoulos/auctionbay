@@ -18,7 +18,7 @@ const _validate = async (user: IUser): Promise<IUser> => {
 
 const getAllUsers = async (input) => {
   const users = await User.find({});
-  return users.map((user: IUser) => user.toJSON);
+  return users.map((user: IUser) => user.toJSON());
 };
 
 const createUser = async (input) => {

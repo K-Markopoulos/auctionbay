@@ -31,15 +31,15 @@ router.route('/:id').get(
 );
 
 // Update auction by id
-router.route('/:id').post(
+router.route('/:id').put(
   authenticate,
-  guard.asOwner,
+  guard.asOwner(),
   prepare(method.updateAuction),
   respond
 );
 
 // Place a bid
-router.route('/:id').put(
+router.route('/:id/bid').post(
   authenticate,
   guard.asRole(enums.Role.BIDDER),
   prepare(method.placeBid),

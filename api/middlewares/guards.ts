@@ -36,12 +36,12 @@ const asSelf = () => {
 
 const asOwner = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const document = await Auction.findById(req.params.id, 'seller').populate('seller');
+    const document = await Auction.findById(req.params.id);
     if (!document) {
       console.warn('The document was not fount');
       return next(new errors.NotFoundError());
     }
-    if ((document.seller as IUser)._id !== req.params.id) {
+    if (!(document.seller as IUser)._id.equals(res.locals.accessor._id)) {
       console.warn('The accessor is not authorized');
       return next(new errors.ForbiddenError());
     }
