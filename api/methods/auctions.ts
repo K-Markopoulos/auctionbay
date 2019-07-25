@@ -16,6 +16,7 @@ const _validateBid = (input: any, auction: IAuction) => {
   }
 
   // check if it's not the highest bid
+  // TODO: check only the first, as we insert them in order
   const isHighest = (auction.bids as IBid[]).every((otherBid: IBid) => bid.amount > otherBid.amount);
   if (!isHighest) {
     console.info('Bid submitted is not the highest.');
@@ -50,7 +51,6 @@ const updateAuction = async (input) => {
   const changes = {
     name: input.name,
     category: input.category,
-    buyPrice: input.buyPrice,
     location: input.location,
     description: input.description,
     images: input.images

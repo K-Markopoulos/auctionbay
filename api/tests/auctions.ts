@@ -9,7 +9,7 @@ import users = require('../methods/users');
 
 const auctionData = {
   name: faker.commerce.productName(),
-  category: faker.commerce.product(),
+  category: [faker.commerce.product()],
   buyPrice: 1000,
   firstBid: 10,
   location: helpers.createLocation(),
@@ -44,11 +44,11 @@ describe('Test auctions routes', function() {
       p.should.have.status(200);
     });
 
-    // Skip until validation is implemented
-    it.skip('should not create an auction with wrong input', async () => {
-      const p = await post(server, '/api/auctions/', {});
+    it('should not create an auction with wrong input', async () => {
+      const p = await post(server, '/api/auctions/', {}, sellerToken);
 
       p.should.have.status(400);
+      p.body.error.should.equals('MISSING_NAME');
     });
 
     it('should not create an auction by unknown user', async () => {
@@ -180,12 +180,14 @@ describe('Test auctions routes', function() {
       const p = await post(server, `/api/auctions/${auction._id}/bid`, bid, bidderToken);
 
       p.should.have.status(400);
+      p.body.error.should.equals('INVALID_AMOUNT');
     });
 
     it('should not place a bid with no input', async () => {
       const p = await post(server, `/api/auctions/${auction._id}/bid`, {}, bidderToken);
 
       p.should.have.status(400);
+      p.body.error.should.equals('MISSING_AMOUNT');
     });
 
     it('should not place a low bid', async () => {

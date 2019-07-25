@@ -10,7 +10,7 @@ import users = require('../methods/users');
 const registerData = {
   username: 'user',
   email: 'a@a.com',
-  password: 'Secret',
+  password: 'SuperSecret_1',
   firstName: 'Joe',
   lastName: 'Doe',
   location: {
@@ -34,8 +34,7 @@ describe('Test users routes', function() {
       p.should.have.status(200);
     });
 
-    // Skip until validation is implemented
-    it.skip('should not create a user with wrong input', async () => {
+    it('should not create a user with wrong input', async () => {
       const p = await post(server, '/api/users/', {});
 
       p.should.have.status(400);
@@ -56,13 +55,20 @@ describe('Test users routes', function() {
       p.should.have.status(400);
       p.body.should.have.property('error').that.equals('USERNAME_ALREADY_EXISTS');
     });
+
+    it('should not create a user with weak password', async () => {
+      const p = await post(server, '/api/users/', {...registerData, password: '1234'});
+
+      p.should.have.status(400);
+      p.body.error.should.equals('WEAK_PASSWORD');
+    });
   });
 
   describe('POST @ /authenticate', function () {
     it('should authenticate a user', async () => {
       const creds = {
         email: 'blo@bla.com',
-        password: 'Super_secure'
+        password: 'Super_secure1'
       }
       await helpers.createUser(creds);
       const p = await post(server, '/api/users/authenticate', creds);
@@ -72,8 +78,7 @@ describe('Test users routes', function() {
       p.body.should.have.property('_id');
     });
 
-    // Skip until validation is implemented
-    it.skip('should not authenticate a user with wrong input', async () => {
+    it('should not authenticate a user with wrong input', async () => {
       const p = await post(server, '/api/users/authenticate', {});
       
       p.should.have.status(400);
@@ -82,7 +87,7 @@ describe('Test users routes', function() {
     it('should not authenticate a not existing user', async () => {
       const creds = {
         email: 'blo@bla.com',
-        password: 'Super_secure'
+        password: 'Super_secure1'
       }
       await helpers.createUser(creds);
       creds.email = 'unknown@mail.com';
@@ -94,7 +99,7 @@ describe('Test users routes', function() {
     it('should not authenticate a user with wrong password', async () => {
       const creds = {
         email: 'blo@bla.com',
-        password: 'Super_secure'
+        password: 'Super_secure1'
       }
       await helpers.createUser(creds);
       creds.password = 'wrong';
