@@ -110,6 +110,7 @@ UserSchema.pre<IUser>('save', function(next) {
 
 UserSchema.methods.toJSON = function() {
   return {
+    id: this._id,
     username: this.username,
     email: this.email,
     firstName: this.firstName,
@@ -117,7 +118,8 @@ UserSchema.methods.toJSON = function() {
     location: this.location,
     phoneNumber: this.phoneNumber,
     taxId: this.taxId,
-    role: this.role
+    role: this.role,
+    status: this.status
   };
 };
 

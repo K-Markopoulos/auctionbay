@@ -65,9 +65,9 @@ router.beforeEach((to, from, next) => {
   } else if (loggedIn && onlyWhenLoggedOut) {
     // nothing to do on login page, go home
     next('/');
+  } else {
+    next();
   }
-
-  next();
 });
 
 export default router;

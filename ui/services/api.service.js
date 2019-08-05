@@ -1,10 +1,23 @@
 import axios from 'axios'
 import TokenService from './token.service'
-import https from 'https';
+import https from 'https'
+import router from '../router'
 
 axios.defaults.httpsAgent = new https.Agent({
   rejectUnauthorized: false
 });
+
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        const {status} = error.response;
+        if (status === 401) {
+          TokenService.removeToken();
+          router.push('login');
+        }
+        return Promise.reject(error);
+   }
+  );
 
 const ApiService = {
   

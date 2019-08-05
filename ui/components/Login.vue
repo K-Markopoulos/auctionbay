@@ -60,6 +60,8 @@
         TokenService.saveToken(res.data.token);
         ApiService.setHeader();
         console.log('Logged in');
+
+        this.$router.push(this.$router.history.current.query.redirect || '/');
       },
       onError: function(res) {
         console.log('Failed to login:', res.message);
