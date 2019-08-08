@@ -117,6 +117,7 @@ const AuctionSchema = new mongoose.Schema<IAuction>({
 
 AuctionSchema.methods.toJSON = function() {
   return {
+    id: this.id,
     name: this.name,
     category: this.category,
     buyPrice: this.buyPrice,

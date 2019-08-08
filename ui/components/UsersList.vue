@@ -1,36 +1,29 @@
 <template>
-  <div>
-    <v-container fluid fill-height>
-      <v-layout align-center justify-center>
-        
-        <v-flex xs12 sm8 md6>
-          <v-toolbar dark color="primary" >
-            <v-toolbar-title>Users</v-toolbar-title>
-          </v-toolbar>
-          <v-progress-linear v-if="isLoading" indeterminate color="purple"></v-progress-linear>
-          <v-list width="auto">
-            <v-list-item dense v-for="user in users" :key="user.id">
-              <v-list-item-action>
-                <v-checkbox :disabled="isApproved(user)" v-model="user.selected"></v-checkbox>
-              </v-list-item-action>
+  <v-flex xs12 sm8 md6>
+    <v-toolbar dark color="primary" >
+      <v-toolbar-title>Users</v-toolbar-title>
+    </v-toolbar>
+    <v-progress-linear v-if="isLoading" indeterminate color="purple"></v-progress-linear>
+    <v-list width="auto">
+      <v-list-item dense v-for="user in users" :key="user.id">
+        <v-list-item-action>
+          <v-checkbox :disabled="isApproved(user)" v-model="user.selected"></v-checkbox>
+        </v-list-item-action>
 
-              <v-list-item-content>
-                <v-list-item-title v-text="user.username"></v-list-item-title>
-                <v-list-item-subtitle v-text="user.firstName + ' ' + user.lastName"></v-list-item-subtitle>
-                <v-list-item-subtitle v-text="userDetails(user)"></v-list-item-subtitle>
-              </v-list-item-content>
-              
-              <v-list-item-action>
-                <v-btn v-if="isApproved(user)" v-text="user.status" disabled text small></v-btn>
-                <v-btn v-if="isPending(user)" :loading="user.approving" @click="approveUser(user)" small color="primary">Approve</v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-          <v-btn block :disabled="!anySelected" @click="approveUsers" color="primary">Approve selected</v-btn>
-        </v-flex>
-      </v-layout>
-    </v-container>
-  </div>
+        <v-list-item-content>
+          <v-list-item-title v-text="user.username"></v-list-item-title>
+          <v-list-item-subtitle v-text="user.firstName + ' ' + user.lastName"></v-list-item-subtitle>
+          <v-list-item-subtitle v-text="userDetails(user)"></v-list-item-subtitle>
+        </v-list-item-content>
+        
+        <v-list-item-action>
+          <v-btn v-if="isApproved(user)" v-text="user.status" disabled text small></v-btn>
+          <v-btn v-if="isPending(user)" :loading="user.approving" @click="approveUser(user)" small color="primary">Approve</v-btn>
+        </v-list-item-action>
+      </v-list-item>
+    </v-list>
+    <v-btn block :disabled="!anySelected" @click="approveUsers" color="primary">Approve selected</v-btn>
+  </v-flex>
 </template>
 
 <script>
