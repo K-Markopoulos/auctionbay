@@ -28,6 +28,7 @@
             </v-form>
           </v-card-text>
           <v-card-actions>
+            <router-link to="/register">Create an account</router-link>
             <v-spacer></v-spacer>
             <v-btn color="primary" @click="onSubmit">Login</v-btn>
           </v-card-actions>

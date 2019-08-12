@@ -5,7 +5,7 @@
 
     <v-spacer></v-spacer>
 
-    <v-toolbar-items>
+    <v-toolbar-items v-if="isLoggedIn()">
       <v-btn to="/" text> Home </v-btn>
       <v-btn to="/auctions" text> Auctions </v-btn>
       <v-btn to="/profile" text> Profile </v-btn>

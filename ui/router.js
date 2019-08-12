@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import TokenService from './services/token.service'
 import Home from './components/Home'
 import Login from './components/Login'
+import Registration from './components/Registration'
 import AuctionsList from './components/AuctionsList'
 import AuctionPage from './components/AuctionPage'
 import UsersList from './components/UsersList'
@@ -19,6 +20,14 @@ const router = new VueRouter({
     {
       path: '/login',
       component: Login,
+      meta: {
+        public: true,
+        onlyWhenLoggedOut: true
+      }
+    },
+    {
+      path: '/register',
+      component: Registration,
       meta: {
         public: true,
         onlyWhenLoggedOut: true

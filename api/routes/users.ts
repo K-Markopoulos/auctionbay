@@ -25,7 +25,7 @@ const createUserSchema = {
     username: validator.string().required(),
     email: validator.string().email().required(),
     // at least 8 digits, one letter and one digit
-    password: validator.string().regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=-]{8,}$/).required(),
+    password: validator.string().regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*():_+=-]{8,}$/).required(),
     firstName: validator.string().required(),
     lastName: validator.string().required(),
     location: validator.object({
