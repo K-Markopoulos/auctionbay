@@ -8,13 +8,14 @@
             <v-spacer></v-spacer>
           </v-toolbar>
           <v-card-text>
-            <v-form>
+            <v-form ref="form" v-model="valid">
               <v-text-field
                 v-model="email"
                 label="Email"
                 name="email"
                 prepend-icon="email"
                 type="text"
+                :rules="emailRules"
               ></v-text-field>
 
               <v-text-field
@@ -24,8 +25,10 @@
                 name="password"
                 prepend-icon="lock"
                 type="password"
+                :rules="[v => !!v || 'Password is required']"
               ></v-text-field>
             </v-form>
+          <v-text class="red--text" v-text="errorMessages"></v-text>
           </v-card-text>
           <v-card-actions>
             <router-link to="/register">Create an account</router-link>
@@ -47,16 +50,27 @@
     data () {
       return {
         email: '',
+        emailRules: [
+          v => !!v || 'Email is required',
+          v => /.+@.+\..+/.test(v) || 'Email must be valid',
+        ],
         password: '',
+        errorMessages: '',
+        valid: true
       }
     },
     methods: {
       onSubmit: function() {
-        ApiService.post('/users/authenticate', {
-          email: this.email,
-          password: this.password
-        }).then(this.onSuccess).catch(this.onError);
+        this.$refs.form.validate();
+        if (this.valid) {
+          this.errorMessages = '';
+          ApiService.post('/users/authenticate', {
+            email: this.email,
+            password: this.password
+          }).then(this.onSuccess).catch(this.onError);
+        }
       },
+
       onSuccess: function(res) {
         TokenService.saveToken(res.data.token);
         ApiService.setHeader();
@@ -64,8 +78,11 @@
 
         this.$router.push(this.$router.history.current.query.redirect || '/');
       },
+
       onError: function(res) {
-        console.log('Failed to login:', res.message);
+        this.errorMessages = res.response.status === 401
+          ? 'Wrong credentials. Email and password do not match.'
+          : 'Failed to login';
       }
     }
   }
