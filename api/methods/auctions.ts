@@ -26,6 +26,15 @@ const _validateBid = (input: any, auction: IAuction) => {
   return bid;
 };
 
+const _getQueryOptions = (input: any) => {
+  const page = Number(input.page) || 0;
+  const limit = Number(input.limit) || 0;
+  return {
+    skip: page * limit,
+    limit: limit,
+  }
+};
+
 const createAuction = async (input) => {
   const auction = new Auction(input);
   auction.seller = input.accessor;
@@ -43,8 +52,13 @@ const getAuction = async (input) => {
 };
 
 const getAllAuctions = async (input) => {
-  const auctions = await Auction.find({});
-  return auctions.map((auction: IAuction) => auction.toJSON());
+  const options = _getQueryOptions(input);
+  const auctions = await Auction.find({},{}, options);
+  const auctionsCount = await Auction.countDocuments();
+  return {
+    data: auctions.map((auction: IAuction) => auction.toJSON()),
+    total: auctionsCount
+  }
 };
 
 const updateAuction = async (input) => {

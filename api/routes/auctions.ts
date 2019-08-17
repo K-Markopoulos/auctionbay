@@ -19,7 +19,7 @@ const getAll = {
     query: validator.string().optional(),
     name: validator.string().optional(),
     category: validator.string().optional(),
-    cursor: validator.number().optional(),
+    page: validator.number().optional(),
     limit: validator.number().optional()
   }
 };
