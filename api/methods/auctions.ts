@@ -26,6 +26,17 @@ const _validateBid = (input: any, auction: IAuction) => {
   return bid;
 };
 
+const _getQueryFilters = (input: any) => {
+  const filters = {};
+  if (input.name) {
+    filters['name'] = new RegExp(input.name, 'i');
+  }
+  if (input.category) {
+    filters['category'] = input.category;
+  }
+  return filters;
+};
+
 const _getQueryOptions = (input: any) => {
   const page = Number(input.page) || 0;
   const limit = Number(input.limit) || 0;
@@ -52,9 +63,10 @@ const getAuction = async (input) => {
 };
 
 const getAllAuctions = async (input) => {
+  const filters = _getQueryFilters(input);
   const options = _getQueryOptions(input);
-  const auctions = await Auction.find({},{}, options);
-  const auctionsCount = await Auction.countDocuments();
+  const auctions = await Auction.find(filters,{}, options);
+  const auctionsCount = await Auction.countDocuments(filters);
   return {
     data: auctions.map((auction: IAuction) => auction.toJSON()),
     total: auctionsCount

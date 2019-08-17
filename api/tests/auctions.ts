@@ -92,14 +92,80 @@ describe('Test auctions routes', function() {
     });
   });
 
-  describe('GET @ /', function() {
+  describe.only('GET @ /', function() {
     it('should get all auctions', async () => {
       // create 10 auctions
       await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
       const p = await get(server, `/api/auctions/`, sellerToken);
 
       p.should.have.status(200);
-      p.body.should.be.an('array').with.length(10);
+      p.body.data.should.be.an('array').with.length(10);
+    });
+
+    it('should get the first page of all auctions', async () => {
+      // create 10 auctions
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
+      const query = `page=${0}&limit=${5}`;
+      const p = await get(server, `/api/auctions/?${query}`, sellerToken);
+
+      p.should.have.status(200);
+      p.body.data.should.be.an('array').with.length(5);
+      p.body.total.should.equal(10);
+    });
+
+    it('should get the second page of all auctions', async () => {
+      // create 10 auctions
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
+      const query = `page=${1}&limit=${5}`;
+      const p = await get(server, `/api/auctions/?${query}`, sellerToken);
+
+      p.should.have.status(200);
+      p.body.data.should.be.an('array').with.length(5);
+      p.body.total.should.equal(10);
+    });
+
+    it('should get auctions by category', async () => {
+      // create 10 auctions
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
+      await Promise.all([...Array(3)].map(() => helpers.createAuction({ seller: seller, category: ['CategoryOne'] })));
+      const query = `category=CategoryOne`;
+      const p = await get(server, `/api/auctions/?${query}`, sellerToken);
+
+      p.should.have.status(200);
+      p.body.data.should.be.an('array').with.length(3);
+      p.body.total.should.equal(3);
+      p.body.data.forEach(x => {
+        x.category.should.contain('CategoryOne');
+      });
+    });
+
+    it('should get a page of auctions by category', async () => {
+      // create 10 auctions
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller, category: ['CategoryOne'] })));
+      const query = `category=CategoryOne&page=1&limit=7`;
+      const p = await get(server, `/api/auctions/?${query}`, sellerToken);
+
+      // console.log(p.body.data);
+      p.should.have.status(200);
+      p.body.data.should.be.an('array').with.length(3);
+      p.body.total.should.equal(10);
+      p.body.data.forEach((x) => {
+        x.category.should.contain('CategoryOne');
+      });
+    });
+
+    it('should get a page of auctions by name', async () => {
+      // create 10 auctions
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller, name: 'SomethingRare'+faker.random.word() })));
+      const query = `name=SomethingRare&page=1&limit=6`;
+      const p = await get(server, `/api/auctions/?${query}`, sellerToken);
+
+      // console.log(p.body.data);
+      p.should.have.status(200);
+      p.body.data.should.be.an('array').with.length(4);
+      p.body.total.should.equal(10);
     });
   });
 
