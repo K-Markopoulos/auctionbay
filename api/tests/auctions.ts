@@ -92,7 +92,7 @@ describe('Test auctions routes', function() {
     });
   });
 
-  describe.only('GET @ /', function() {
+  describe('GET @ /', function() {
     it('should get all auctions', async () => {
       // create 10 auctions
       await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));

@@ -122,7 +122,7 @@ AuctionSchema.methods.toJSON = function() {
     category: this.category,
     buyPrice: this.buyPrice,
     firstBid: this.firstBid,
-    current: this.bids && this.bids[0] || this.firstBid,
+    current: this.bids && this.bids[0] && this.bids[0].amount || this.firstBid,
     bids: this.bids,
     location: this.location,
     started: this.started,

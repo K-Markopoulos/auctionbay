@@ -4,14 +4,14 @@ import User, { IUser } from '../models/user';
 import Enums = require('../models/enums');
 import Auction from '../models/auction';
 
-const asRole = (role: string) => {
+const asRole = (roles: string[]) => {
   return async (_req: Request, res: Response, next: NextFunction) => {
     const user = await User.findById(res.locals.accessor._id);
     if (!user) {
       console.warn('The accessor is not authenticated');
       return next(new errors.UnauthorizedError());
     }
-    if (user.role !== role) {
+    if (!roles.includes(user.role)) {
       console.warn('The accessor is not authorized');
       return next(new errors.ForbiddenError());
     }

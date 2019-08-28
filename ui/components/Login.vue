@@ -28,7 +28,7 @@
                 :rules="[v => !!v || 'Password is required']"
               ></v-text-field>
             </v-form>
-          <v-text class="red--text" v-text="errorMessages"></v-text>
+          <span class="red--text" v-text="errorMessages"></span>
           </v-card-text>
           <v-card-actions>
             <router-link to="/register">Create an account</router-link>

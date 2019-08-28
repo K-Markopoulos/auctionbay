@@ -8,9 +8,19 @@
     <v-toolbar-items v-if="isLoggedIn()">
       <v-btn to="/" text> Home </v-btn>
       <v-btn to="/auctions" text> Auctions </v-btn>
-      <v-btn to="/profile" text> Profile </v-btn>
       <v-btn to="/users" text> Users </v-btn>
-      <v-btn @click="logout" v-if="isLoggedIn()" text> Logout </v-btn>
+      <v-icon @click="openNewAuctionForm">mdi-plus</v-icon>
+      <v-avatar id="user-avatar" size="30">
+        <v-img src="" class="elevation-1"></v-img>
+      </v-avatar>
+      <v-menu bottom offset-y>
+        <template v-slot:activator="{ on }">
+          <v-icon v-on="on">mdi-menu-down</v-icon>
+        </template>
+        <v-list>
+         <v-list-item @click="logout" v-if="isLoggedIn()">Logout</v-list-item>
+        </v-list>
+      </v-menu>
     </v-toolbar-items>
   </v-app-bar>
 
@@ -33,9 +43,16 @@ export default {
     isLoggedIn() {
       return !!TokenService.getToken();
     },
+
     logout() {
       TokenService.removeToken();
       this.$router.push('/login');
+    },
+
+    openNewAuctionForm() {
+      // TODO
+      alert('New auction!');
+
     }
   }
 }
@@ -66,5 +83,10 @@ li {
 
 a {
   color: #42b983;
+}
+
+#user-avatar {
+  align-self: center;
+  margin: 0px 10px;
 }
 </style>

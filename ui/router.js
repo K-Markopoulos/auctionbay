@@ -39,7 +39,8 @@ const router = new VueRouter({
     },
     {
       path: '/auctions/:id',
-      component: AuctionPage
+      component: AuctionPage,
+      props: true
     },
     {
       path: '/users',
@@ -47,7 +48,8 @@ const router = new VueRouter({
     },
     {
       path: '/users/:id',
-      component: UserPage
+      component: UserPage,
+      props: true
     },
     {
       path: '*',
