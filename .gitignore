@@ -4,4 +4,3 @@ dist
 *.pem
 .vscode
 *.pdf
-.nvmrc
