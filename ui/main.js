@@ -14,6 +14,36 @@ if (TokenService.getToken()) {
   ApiService.setHeader()
 }
 
+Vue.prototype.$categories = [
+  "Antiques",
+  "Art",
+  "Books",
+  "CDs, DVDs, Games",
+  "Clothing",
+  "Collectibles",
+  "Computers",
+  "Dining",
+  "Electronics",
+  "Food & Gourmet Items",
+  "For Your Pet",
+  "Golf & Sports Gear",
+  "Handbags",
+  "Health & Fitness",
+  "Home",
+  "Jewelry",
+  "Lawn & Garden",
+  "Memorabilia",
+  "Other",
+  "Services",
+  "Spa & Beauty",
+  "Tickets-Entertainment",
+  "Tickets-Sports",
+  "Toys",
+  "Travel",
+  "Unique Experiences",
+  "Wine",
+];
+
 new Vue({
   vuetify,
   router,

@@ -18,7 +18,7 @@
         prepend-icon="category"
         hide-details
         single-line
-        :items="categories"
+        :items="$categories"
         @input="getAuctions"
         >
       </v-select>
@@ -66,7 +66,6 @@
     data () {
       return {
         auctions: [],
-        categories: [],
         page: 1,
         limit: 16,
         totalPages: 0,
@@ -93,12 +92,6 @@
         this.loading = false;
         this.auctions = res.data.data;
         this.totalPages = Math.ceil(res.data.total / this.limit);
-
-        // TEMP to test categories filters, these are not all available categories
-        // We need to find a way to fetch categories
-        this.auctions.forEach(x => {
-          this.categories = this.categories.concat(x.category);
-        });
       },
 
       onError: function(res) {

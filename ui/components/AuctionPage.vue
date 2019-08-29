@@ -19,7 +19,7 @@
               <v-btn class="primary" @click="openBidDialog">Place your bid</v-btn>
             </v-row>
           </v-card-text>
-          <v-card-text>
+          <v-card-text v-if="auction.buyPrice">
             <div class="title text--primary">Buy it for: {{auction.buyPrice}}$</div>
             <v-btn class="primary" @click="buyConfirmDialog = true">Buy it now</v-btn>
           </v-card-text>

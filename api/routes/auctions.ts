@@ -27,7 +27,7 @@ const createAuction = {
   body: {
     name: validator.string().required(),
     category: validator.array().items(validator.string()).required(),
-    buyPrice: validator.number().required(),
+    buyPrice: validator.number().optional().allow(''),
     firstBid: validator.number().required(),
     location: validator.object({
       address: validator.string().required(),

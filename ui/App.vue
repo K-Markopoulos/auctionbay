@@ -9,7 +9,7 @@
       <v-btn to="/" text> Home </v-btn>
       <v-btn to="/auctions" text> Auctions </v-btn>
       <v-btn to="/users" text> Users </v-btn>
-      <v-icon @click="openNewAuctionForm">mdi-plus</v-icon>
+      <v-icon @click="openNewAuctionForm = true">mdi-plus</v-icon>
       <v-avatar id="user-avatar" size="30">
         <v-img src="" class="elevation-1"></v-img>
       </v-avatar>
@@ -27,18 +27,29 @@
   <v-container fluid fill-height justify-center>
     <router-view></router-view>
   </v-container>
+
+  <v-dialog v-model="openNewAuctionForm">
+    <create-auction-form :on-cancel="closeDialog"></create-auction-form>
+  </v-dialog>
 </v-app>
 </template>
 
 <script>
 import TokenService from './services/token.service';
+import CreateAuctionFrom from './components/CreateAuctionForm';
+
 export default {
   name: 'app',
+  components: {
+    'create-auction-form': CreateAuctionFrom
+  },
+
   data () {
     return {
-      
+      openNewAuctionForm: false
     }
   },
+
   methods: {
     isLoggedIn() {
       return !!TokenService.getToken();
@@ -49,10 +60,8 @@ export default {
       this.$router.push('/login');
     },
 
-    openNewAuctionForm() {
-      // TODO
-      alert('New auction!');
-
+    closeDialog() {
+      this.openNewAuctionForm = false;
     }
   }
 }
