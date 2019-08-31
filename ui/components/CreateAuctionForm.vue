@@ -21,11 +21,11 @@
           type="text"
         ></v-textarea>
 
-        <v-combobox
+        <v-autocomplete
             v-model="auction.category"
             :items="$categories"
             chips
-            clearable
+            deletable-chips
             label="Categories"
             multiple
           >
@@ -33,12 +33,14 @@
               <v-chip
                 v-bind="attrs"
                 :input-value="selected"
+                close
                 @click="select"
-                v-text="item"
+                @click:close="remove(item)"
               >
+              {{item}}
               </v-chip>
             </template>
-          </v-combobox>
+          </v-autocomplete>
 
           <v-file-input
             v-model="attachments"
@@ -243,6 +245,11 @@
 
       onError: function(res) {
         console.log('Failed to create new auction:', res.message);
+      },
+
+      remove (item) {
+        const index = this.auction.category.indexOf(item)
+        if (index >= 0) this.auction.category.splice(index, 1)
       },
     }
   }
