@@ -6,6 +6,7 @@ import respond = require('../middlewares/respond');
 import method = require('../methods/auctions');
 import prepare = require('../middlewares/prepare');
 import { validate } from '../middlewares/validate';
+import upload = require('../middlewares/multipart');
 import enums = require('../models/enums');
 
 const router = express.Router();
@@ -37,7 +38,7 @@ const createAuction = {
     }).optional(),
     ends: validator.date().required(),
     description: validator.string().required(),
-    images: validator.array().items(validator.string()).required()
+    images: validator.array().items(validator.string()).max(10).required()
   }
 };
 
@@ -84,8 +85,9 @@ router.route('/').get(
 // Create new auction
 router.route('/').post(
   authenticate,
-  validate(createAuction),
   guard.asRole([enums.Role.SELLER, enums.Role.ADMINISTRATOR]),
+  upload.parseImages('auction'),
+  validate(createAuction),
   prepare(method.createAuction),
   respond
 );
@@ -101,8 +103,8 @@ router.route('/:id').get(
 // Update auction by id
 router.route('/:id').put(
   authenticate,
-  validate(updateAuction),
   guard.asOwner(),
+  validate(updateAuction),
   prepare(method.updateAuction),
   respond
 );
@@ -110,8 +112,8 @@ router.route('/:id').put(
 // Place a bid
 router.route('/:id/bid').post(
   authenticate,
-  validate(placeBid),
   guard.asRole([enums.Role.BIDDER, enums.Role.ADMINISTRATOR]),
+  validate(placeBid),
   prepare(method.placeBid),
   respond
 );

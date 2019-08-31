@@ -103,6 +103,7 @@
         const self = this;
         clearTimeout(this.debounce);
         this.debounce = setTimeout(() => {
+          self.page = 1;
           self.getAuctions();
         }, 500);
       }

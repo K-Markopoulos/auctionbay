@@ -29,7 +29,7 @@
   </v-container>
 
   <v-dialog v-model="openNewAuctionForm">
-    <create-auction-form :on-cancel="closeDialog"></create-auction-form>
+    <create-auction-form :on-cancel="closeDialog" :on-submit="closeDialog"></create-auction-form>
   </v-dialog>
 </v-app>
 </template>

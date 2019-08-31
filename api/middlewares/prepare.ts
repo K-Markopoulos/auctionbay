@@ -3,6 +3,9 @@ import { Request, Response, NextFunction} from 'express';
 const prepare = (method: Function) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const input = Object.assign({}, req.params, req.query, req.body);
+    if (req.files) {
+      input.files = req.files
+    }
     input.accessor = res.locals.accessor;
       return method(input).then((result) => {
         res.locals.content = result;

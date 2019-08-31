@@ -40,6 +40,20 @@
             </template>
           </v-combobox>
 
+          <v-file-input
+            v-model="attachments"
+            accept="image/png, image/jpeg, image/bmp"
+            prepend-inner-icon="mdi-camera"
+            prepend-icon=""
+            label="Upload images of the item"
+            multiple
+            chips
+            :rules="[
+              v => v.every(x => x.size < 2000000) || 'Image should be less than 2MB!',
+              v => v.length <= 10 || 'Max 10 images.'
+            ]"
+          ></v-file-input>
+
         <v-divider></v-divider>
         
         <v-layout wrap justify-space-between>
@@ -111,7 +125,7 @@
                   :rules="[v => !!v || 'End time is required']"
                 ></v-text-field>
               </template>
-              <v-time-picker ref="timer" v-model="endsTime">
+              <v-time-picker ref="timer" v-model="endsTime" :min="nowTime">
                 <div class="flex-grow-1"></div>
                 <v-btn text color="primary" @click="menu2 = false">OK</v-btn>
               </v-time-picker>
@@ -162,7 +176,7 @@
     <v-card-actions>
       <v-btn @click="onCancel" text>Cancel</v-btn>
       <v-spacer></v-spacer>
-      <v-btn :disabled="!valid" color="primary" @click="onSubmit">Submit</v-btn>
+      <v-btn :disabled="!valid" color="primary" @click="onFormSubmit">Submit</v-btn>
       <v-spacer></v-spacer>
     </v-card-actions>
   </v-card>
@@ -175,7 +189,8 @@
   export default {
     name: 'CreateAuctionForm',
     props: [
-      'onCancel'
+      'onCancel',
+      'onSubmit'
     ],
     data () {
       return {
@@ -184,6 +199,7 @@
           location: {},
           images: []
         },
+        attachments: [],
         endsDate: '',
         endsTime: '',
         menu: false,
@@ -195,18 +211,29 @@
     computed: {
       today: function() {
         return new Date().toISOString().substring(0,10);
+      },
+      nowTime: function() {
+        return moment().format('h:mm');
       }
     },
 
     methods: {
-      onSubmit: function() {
+      onFormSubmit: function() {
         this.$refs.form.validate();
         if (!this.valid) {
           return
         }
         this.auction.ends = new Date(this.endsDate + ' ' + this.endsTime).toISOString();
 
-        ApiService.post('/auctions/', this.auction).then(this.onSuccess).catch(this.onError);
+        const formData = this.buildFormData();
+        ApiService.post('/auctions/', formData, true).then(this.onSuccess).catch(this.onError);
+      },
+
+      buildFormData: function() {
+        const formData = new FormData();
+        formData.append('auction', JSON.stringify(this.auction));
+        this.attachments.forEach(file => formData.append('images', file));
+        return formData;
       },
 
       onSuccess: function(res) {
@@ -216,7 +243,7 @@
 
       onError: function(res) {
         console.log('Failed to create new auction:', res.message);
-      }
+      },
     }
   }
 </script>

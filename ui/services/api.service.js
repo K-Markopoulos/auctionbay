@@ -8,46 +8,53 @@ axios.defaults.httpsAgent = new https.Agent({
 });
 
 axios.interceptors.response.use(
-    response => response,
-    error => {
-        const {status} = error.response;
-        if (status === 401) {
-          TokenService.removeToken();
-          router.push('login');
-        }
-        return Promise.reject(error);
+  response => response,
+  error => {
+    const {status} = error.response;
+    if (status === 401) {
+      TokenService.removeToken();
+      router.push('login');
+    }
+    return Promise.reject(error);
    }
   );
 
 const ApiService = {
   
-    init(baseURL) {
-        axios.defaults.baseURL = baseURL;
-    },
+  init(baseURL) {
+    axios.defaults.baseURL = baseURL;
+  },
 
-    setHeader() {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${TokenService.getToken()}`
-    },
+  setHeader() {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${TokenService.getToken()}`
+  },
 
-    removeHeader() {
-        axios.defaults.headers.common = {}
-    },
+  removeHeader() {
+    axios.defaults.headers.common = {}
+  },
 
-    get(resource) {
-        return axios.get(resource)
-    },
+  get(resource) {
+    return axios.get(resource)
+  },
 
-    post(resource, data) {
-        return axios.post(resource, data)
-    },
+  post(resource, data, multipart) {
+    const config = multipart 
+      ? {
+          headers: {
+            'content-type': 'multipart/form-data'
+          }
+        }
+      : {};
+    return axios.post(resource, data, config)
+  },
 
-    put(resource, data) {
-        return axios.put(resource, data)
-    },
+  put(resource, data) {
+    return axios.put(resource, data)
+  },
 
-    delete(resource) {
-        return axios.delete(resource)
-    },
+  delete(resource) {
+    return axios.delete(resource)
+  },
 };
 
 export default ApiService;

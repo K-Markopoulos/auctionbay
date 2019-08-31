@@ -23,9 +23,11 @@
         justify="end"
         class="ma-0"
       >
-        <v-icon class="mr-1">mdi-cash</v-icon>
-        <span class="subheading mr-2" v-text="auction.buyPrice + '$'"></span>
-        <span class="mr-1">·</span>
+        <span v-if="auction.buyPrice">
+          <v-icon class="mr-1">mdi-cash</v-icon>
+          <span class="subheading mr-2" v-text="auction.buyPrice + '$'"></span>
+          <span class="mr-1">·</span>
+        </span>
         <v-icon class="mr-1">mdi-gavel</v-icon>
         <span class="subheading" v-text="getBidDetails"></span>
       </v-row>

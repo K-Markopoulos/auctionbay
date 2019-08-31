@@ -1,6 +1,8 @@
+import fs = require('fs');
 import User, { IUser }from '../models/user';
 import Auction, { IAuction, IBid }from '../models/auction';
 import errors = require('../common/errors');
+import { IFile } from '../models/files';
 
 const _validateBid = (input: any, auction: IAuction) => {
   const bid = {
@@ -46,9 +48,48 @@ const _getQueryOptions = (input: any) => {
   }
 };
 
+const _moveImages = (files: any[], path): Promise<IFile>[] => {
+  !fs.existsSync(path) && fs.mkdirSync(path);
+  return files.map(file => {
+    const newPath =  `${path}/${file.filename}`;
+    return new Promise((resolve, reject) => {
+      fs.rename(file.path,newPath, (error) => {
+        if (error) {
+          console.log('Error on moving files');
+          reject(error);
+        }
+        console.info(`Create new file ${newPath}`);
+        resolve({ name: file.originalname, fid: file.filename });
+      });
+    })
+    
+  })
+}
+
+const _addImages = async (input: any, auction: IAuction) => {
+  if (!input.files) {
+    return;
+  }
+  const path = `${process.env.UPLOAD_FILE_PATH}/${auction.id}`;
+  const files = await Promise.all(_moveImages(input.files, path));
+  auction.images = files;
+  console.log(files);
+}
+
 const createAuction = async (input) => {
-  const auction = new Auction(input);
-  auction.seller = input.accessor;
+  const newAuction = {
+    name: input.name,
+    category: input.category,
+    buyPrice: input.buyPrice,
+    firstBid: input.firstBid,
+    ends: input.ends,
+    location: input.location,
+    description: input.description,
+    seller: input.accessor
+  }
+  const auction = new Auction(newAuction);
+  await _addImages(input, auction);
+
   console.info('Created new auction: ', auction.name);
   return (await auction.save()).toJSON();
 };

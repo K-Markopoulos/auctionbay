@@ -1,7 +1,7 @@
 import mongoose  = require('mongoose');
 import enums = require('./enums');
 import User, { IUser, UserSchema } from './user';
-import FileSchema = require('./files');
+import FileSchema, { IFile } from './files';
 import Location, { ILocation, IItemLocation, LocationSchema } from './location';
 
 // Bid
@@ -44,7 +44,7 @@ export interface IAuction extends mongoose.Document{
   ends: Date,
   seller: IUser | mongoose.Types.ObjectId,
   description: String,
-  images?: any[]
+  images?: IFile[]
 }
 
 const AuctionSchema = new mongoose.Schema<IAuction>({

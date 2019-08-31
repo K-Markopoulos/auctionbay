@@ -1,10 +1,59 @@
 <template>
   <v-container fluid fill-height>
-    <v-layout>
-      <v-flex large color="grey">
-        <v-img height="600" class="elevation-2" :src="randomImg"></v-img>
-      </v-flex>
-      <v-flex small>
+    <v-row style="align-self: flex-start;">
+      <v-col cols="8" class="elevation-1 grey lighten-3">
+          <div v-if="!hasImages()" class="no-image">
+            No image available
+          </div>
+        <v-window
+          id="auction-images"
+          v-model="imgIndex"
+        >
+          <v-window-item
+            v-for="img in auction.images"
+            :key="img.fid"
+          >
+            <div class="image-window lighten-1">
+              <img class="fit-image" :src="`uploads/${auction.id}/${img.fid}`">
+            </div>
+          </v-window-item>
+        </v-window>
+        <v-card-actions class="justify-space-between" v-if="hasImages()">
+          <v-btn
+            text
+            @click="prev"
+          >
+            <v-icon>mdi-chevron-left</v-icon>
+          </v-btn>
+          <v-item-group
+            v-model="imgIndex"
+            class="text-center"
+            mandatory
+          >
+            <v-item
+              v-for="n in auction.images.length"
+              :key="`btn-${n}`"
+              v-slot:default="{ active, toggle }"
+            >
+              <v-btn
+                :input-value="active"
+                icon
+                small
+                @click="toggle"
+              >
+                <v-icon>mdi-record</v-icon>
+              </v-btn>
+            </v-item>
+          </v-item-group>
+          <v-btn
+            text
+            @click="next"
+          >
+            <v-icon>mdi-chevron-right</v-icon>
+          </v-btn>
+        </v-card-actions>
+      </v-col>
+      <v-col cols="4">
         <v-card outlined>
           <v-card-title v-text="auction.name"></v-card-title>
           <v-card-text v-text="auction.description"></v-card-text>
@@ -24,8 +73,8 @@
             <v-btn class="primary" @click="buyConfirmDialog = true">Buy it now</v-btn>
           </v-card-text>
         </v-card>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
 
     <v-dialog v-model="bidConfirmDialog" width="500">
       <v-card>
@@ -92,8 +141,9 @@
 
     data() {
       return {
-        auction: {},
-        randomImg: "https://images.unsplash.com/photo-1508138221679-760a23a2285b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
+        auction: {
+          images: []
+        },
         loading: true,
         bidConfirmDialog: false,
         buyConfirmDialog: false,
@@ -101,6 +151,7 @@
         bidValueRules: [
           v => !v || v > this.auction.current || "Value must be higher than " + this.auction.current + "$ (Current highest)"
         ],
+        imgIndex: 0
       }
     },
 
@@ -127,6 +178,7 @@
         ApiService.get(`/auctions/${this.id}`).then(res => {
           this.loading = false;
           this.auction = res.data;
+          this.imgIndex = 0;
         }).catch(err => console.log(err));
       },
 
@@ -148,10 +200,54 @@
 
       submitBuy: function() {
 
-      }
+      },
+
+      hasImages: function() {
+        return this.auction.images && this.auction.images.length > 0;
+      },
+
+      next: function() {
+        console.log('next', this.imgIndex);
+        this.imgIndex = this.imgIndex + 1 === this.auction.images.length
+          ? 0
+          : this.imgIndex + 1
+      },
+
+      prev: function() {
+        console.log('prev', this.imgIndex);
+        this.imgIndex = this.imgIndex - 1 < 0
+          ? this.auction.images.length - 1
+          : this.imgIndex - 1
+      },
     }
   }
 </script>
 
 <style>
+#auction-images .v-window__container,
+#auction-images .v-window-item {
+  height: 600px;
+}
+
+.image-window {
+  max-width:100%;
+  max-height:100%;
+  height: 100%;
+  width: auto;
+  background: #cecbcb;
+}
+
+.fit-image {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.no-image {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: x-large;
+}
 </style>
