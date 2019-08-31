@@ -7,8 +7,8 @@
       </v-row>
     </v-parallax>
     <div class="mx-10">
-      <auctions-slider :config="{ active, sortBy: 'ends', order: 'asc' }">Closing soon</auctions-slider>
-      <auctions-slider :config="{ active, sortBy: 'bidsCount', order: 'desc' }">Trending</auctions-slider>
+      <auctions-slider :config="{ active: 1, sortBy: 'ends', order: 'asc' }">Closing soon</auctions-slider>
+      <auctions-slider :config="{ active: 1, sortBy: 'bidsCount', order: 'desc' }">Trending</auctions-slider>
       <auctions-slider>Picked for you (not really)</auctions-slider>
     </div>
   </div>
@@ -26,7 +26,7 @@
 
     data () {
       return {
-        banner: 'https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg',
+        banner: '/assets/banner.jpg',
         auctionsCount: '',
         categoriesCount: this.$categories.length
       }
@@ -53,5 +53,8 @@
 }
 .banner-text {
   flex-direction: column;
+}
+.v-parallax img {
+    filter: brightness(0.5);
 }
 </style>
