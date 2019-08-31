@@ -39,6 +39,7 @@ export interface IAuction extends mongoose.Document{
   buyPrice: Number,
   firstBid: Number,
   bids: IBid[],
+  bidsCount: number,
   location: IItemLocation,
   started: Date,
   ends: Date,
@@ -77,6 +78,12 @@ const AuctionSchema = new mongoose.Schema<IAuction>({
   bids: [{
     type: BidSchema,
   }],
+
+  // The auction's bid count
+  bidsCount: {
+    type: Number,
+    default: 0
+  },
 
   // The item's location
   location: {

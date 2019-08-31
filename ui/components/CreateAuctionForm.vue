@@ -215,7 +215,7 @@
         return new Date().toISOString().substring(0,10);
       },
       nowTime: function() {
-        return moment().format('h:mm');
+        return this.today === this.endsDate ? moment().format('h:mm') : '';
       }
     },
 
@@ -225,7 +225,7 @@
         if (!this.valid) {
           return
         }
-        this.auction.ends = new Date(this.endsDate + ' ' + this.endsTime).toISOString();
+        this.auction.ends = new Date(this.endsDate + ' ' + this.endsTime).toUTCString();
 
         const formData = this.buildFormData();
         ApiService.post('/auctions/', formData, true).then(this.onSuccess).catch(this.onError);

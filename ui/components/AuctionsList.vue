@@ -72,7 +72,7 @@
         loading: true,
         searchQuery: '',
         searchCategory:'',
-        debunce: null
+        debounce: null
       }
     },
     

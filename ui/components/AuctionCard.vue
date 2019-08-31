@@ -5,7 +5,7 @@
     :to="getLink"
   >
     <v-card-title v-text="auction.name"></v-card-title>
-    <v-card-text v-text="auction.description"></v-card-text>
+    <v-card-text class="truncate" v-text="auction.description"></v-card-text>
     <span v-text="getStatus"></span>
 
     <v-card-actions>
@@ -76,5 +76,11 @@
 .auction-card {
   width: 400px;
   height: 200px;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

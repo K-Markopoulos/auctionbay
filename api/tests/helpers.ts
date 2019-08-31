@@ -48,6 +48,7 @@ const createAuction = async (overrides?: any) => {
     buyPrice: 1000,
     firstBid: 10,
     bids: [],
+    bidsCount: overrides && overrides.bids && overrides.bids.length || 0,
     location: createLocation(),
     started: new Date(),
     ends: faker.date.future(),

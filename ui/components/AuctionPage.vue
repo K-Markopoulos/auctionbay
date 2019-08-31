@@ -59,7 +59,7 @@
           <v-card-text v-text="auction.description"></v-card-text>
           <div v-text="getStatusString"></div>
 
-          <v-card-text>
+          <v-card-text v-if="isActive">
             <div class="title text--primary">Highest bid: {{auction.current}}$</div>
             <v-row class="ma-5">
               <v-text-field cols="8" v-model="bidValue" name="bidValue" validate-on-blur
@@ -156,11 +156,13 @@
     },
 
     computed: {
+      isActive: function() {
+        return moment(this.auction.ends) > moment();
+      },
       getStatusString: function() {
-        if (moment(this.auction.ends) > moment()) {
-          return 'Ends ' + moment(this.auction.ends).fromNow();
-        }
-        return 'Closed';
+        return this.isActive
+          ? 'Ends ' + moment(this.auction.ends).fromNow()
+          : 'Auction has ended';
       },
 
       getHighestBid: function() {

@@ -36,15 +36,32 @@ const _getQueryFilters = (input: any) => {
   if (input.category) {
     filters['category'] = input.category;
   }
+  if (input.active) {
+    filters['ends'] = { $gt: new Date().toUTCString() }
+  }
   return filters;
+};
+
+const sortByAvailableFields = {
+  name: 'name',
+  buyPrice: 'buyPrice',
+  current: 'current',
+  bidsCount: 'bidsCount',
+  ends: 'ends'
 };
 
 const _getQueryOptions = (input: any) => {
   const page = Number(input.page) || 0;
   const limit = Number(input.limit) || 0;
+  const sortBy = sortByAvailableFields[input.sortBy] || 'started';
+  const order = input.order === 'desc' ? -1 : 1;
+
   return {
     skip: page * limit,
     limit: limit,
+    sort: {
+      [sortBy]: order
+    }
   }
 };
 
@@ -136,6 +153,7 @@ const placeBid = async (input) => {
   const auction = await Auction.findById(input.id);
   const bid = _validateBid(input, auction);
   auction.bids.unshift(bid as IBid);
+  auction.bidsCount += 1;
   return (await auction.save()).toJSON();
 };
 
