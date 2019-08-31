@@ -52,7 +52,7 @@ const populateUsers = async () => {
 
     // Create 10 Sellers
     ...[...Array(10)].map(() => helpers.createUser({
-      role: enums.Role.SELLER
+      role: enums.Role.REGISTERED
     })),
 
     // Create 10 Guests

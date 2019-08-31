@@ -25,8 +25,8 @@ describe('Test auctions routes', function() {
     await mongoose.connection.collections.users.deleteMany({});
 
     admin = await helpers.createUser({ role: enums.Role.ADMINISTRATOR });
-    seller = await helpers.createUser({ role: enums.Role.SELLER });
-    bidder = await helpers.createUser({ role: enums.Role.BIDDER });
+    seller = await helpers.createUser({ role: enums.Role.REGISTERED });
+    bidder = await helpers.createUser({ role: enums.Role.REGISTERED });
     adminToken = tokens.generate({ _id: admin._id });
     sellerToken = tokens.generate({ _id: seller._id });
     bidderToken = tokens.generate({ _id: bidder._id });
@@ -56,12 +56,6 @@ describe('Test auctions routes', function() {
       const p = await post(server, '/api/auctions/', auctionData, token);
       
       p.should.have.status(401);
-    });
-
-    it('should not create an auction by unauthorized user', async () => {
-      const p = await post(server, '/api/auctions/', auctionData, bidderToken);
-      
-      p.should.have.status(403);
     });
   });
 
@@ -195,7 +189,7 @@ describe('Test auctions routes', function() {
 
     it('should not update an auction by other than owner', async () => {
       const auction = await helpers.createAuction({ seller: seller });
-      const seller2 = await helpers.createUser({ role: enums.Role.SELLER });
+      const seller2 = await helpers.createUser({ role: enums.Role.REGISTERED });
       const token = tokens.generate({ _id: seller2._id });
       const p = await put(server, `/api/auctions/${auction._id}`, changes, token);
 
@@ -228,15 +222,6 @@ describe('Test auctions routes', function() {
       const p = await post(server, `/api/auctions/${auction._id}/bid`, bid);
 
       p.should.have.status(401);
-    });
-
-    it('should not place a bid by unathorized user', async () => {
-      const bid = {
-        amount: bids.reduce((maxAmount, bid) => Math.max(maxAmount, bid.amount), 0) + 100
-      };
-      const p = await post(server, `/api/auctions/${auction._id}/bid`, bid, sellerToken);
-
-      p.should.have.status(403);
     });
 
     it('should not place a bid with wrong input', async () => {

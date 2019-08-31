@@ -85,7 +85,7 @@ router.route('/').get(
 // Create new auction
 router.route('/').post(
   authenticate,
-  guard.asRole([enums.Role.SELLER, enums.Role.ADMINISTRATOR]),
+  guard.asRole([enums.Role.REGISTERED, enums.Role.ADMINISTRATOR]),
   upload.parseImages('auction'),
   validate(createAuction),
   prepare(method.createAuction),
@@ -112,7 +112,7 @@ router.route('/:id').put(
 // Place a bid
 router.route('/:id/bid').post(
   authenticate,
-  guard.asRole([enums.Role.BIDDER, enums.Role.ADMINISTRATOR]),
+  guard.asRole([enums.Role.REGISTERED, enums.Role.ADMINISTRATOR]),
   validate(placeBid),
   prepare(method.placeBid),
   respond

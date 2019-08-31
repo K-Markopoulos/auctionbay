@@ -1,6 +1,7 @@
 import mongoose  = require('mongoose');
 import enums = require('./enums');
 import LocationSchema, { ILocation } from './location';
+import RatingSchema, { IRating } from './rating';
 
 export interface IUser extends mongoose.Document{
   username: string,
@@ -13,6 +14,8 @@ export interface IUser extends mongoose.Document{
   taxId: string,
   role: string,
   status: string,
+  sellerRating: IRating,
+  bidderRating: IRating,
   createdAt: Date,
   updatedAt: Date,
   lastLogin: Date,
@@ -76,10 +79,20 @@ export const UserSchema = new mongoose.Schema<IUser>({
   },
   
   // The user's status in platform
-  status : {
+  status: {
     type: String,
     required: true,
     default: enums.Status.PENDING
+  },
+
+  // The user's rating as a seller
+  sellerRating: {
+    type: RatingSchema
+  },
+
+  // The user's rating as a bidder
+  bidderRating: {
+    type: RatingSchema
   },
 
   // Created timestamp
@@ -119,7 +132,9 @@ UserSchema.methods.toJSON = function() {
     phoneNumber: this.phoneNumber,
     taxId: this.taxId,
     role: this.role,
-    status: this.status
+    status: this.status,
+    sellerRating: this.sellerRating,
+    bidderRating: this.bidderRating
   };
 };
 

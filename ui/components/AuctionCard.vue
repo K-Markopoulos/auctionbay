@@ -16,6 +16,9 @@
         ></v-img>
       </v-avatar>
       <span v-text="getSellerDisplayName"></span>
+      <span>(</span><span v-text="getSellerRating"></span>
+      <v-icon class="star-icon">mdi-star</v-icon>
+      <span>)</span>
 
 
       <v-row
@@ -59,7 +62,11 @@
       },
 
       getSellerDisplayName: function() {
-        return `${this.auction.seller.username}`; 
+        return `${this.auction.seller.username} `; 
+      },
+
+      getSellerRating: function() {
+        return this.auction.seller.sellerRating.avg;
       },
 
       getBidDetails: function() {
@@ -82,5 +89,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.star-icon {
+  color: #efb000 !important;
 }
 </style>
