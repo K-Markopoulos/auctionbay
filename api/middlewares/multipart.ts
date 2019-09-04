@@ -23,7 +23,7 @@ const parseImages = (property: string) => {
         }
       } else {
         // Deserialize input
-        if (property && req.body[property] == typeof String) {
+        if (property && typeof req.body[property] == 'string') {
           req.body = JSON.parse(req.body[property]);
         }
         next();

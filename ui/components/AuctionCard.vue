@@ -4,9 +4,17 @@
     width="400"
     :to="getLink"
   >
-    <v-card-title v-text="auction.name"></v-card-title>
+    <v-img
+      class="white--text"
+      height="200px"
+      :src="getHeaderImg"
+    >
+      <v-card-title class="align-end fill-height shadow" v-text="auction.name"></v-card-title>
+    </v-img>
+
     <v-card-text class="truncate" v-text="auction.description"></v-card-text>
-    <span v-text="getStatus"></span>
+      <span v-text="getStatus"></span>
+    
 
     <v-card-actions>
       <v-avatar class="mr-2" size="30" color="grey">
@@ -53,6 +61,12 @@
         return `/auctions/${this.auction.id}`;
       },
 
+      getHeaderImg: function() {
+        return this.auction.images.length
+          ? `/uploads/${this.auction.id}/${this.auction.images[0].fid}`
+          : '/assets/no-photo-available.png';
+      },
+
       getStatus: function() {
         if (moment(this.auction.ends) > moment()) {
           return 'Ends ' + moment(this.auction.ends).fromNow()
@@ -93,5 +107,10 @@
 
 .star-icon {
   color: #efb000 !important;
+}
+
+.shadow {
+  background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgba(255,0,0,0), rgba(255,0,0,0),rgba(0,0,0,0.5));
+  text-shadow: 1px 1px 7px black;
 }
 </style>
