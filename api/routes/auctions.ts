@@ -92,6 +92,14 @@ router.route('/').post(
   respond
 );
 
+// Create new auction
+router.route('/export').get(
+  authenticate,
+  guard.asAdmin(),
+  prepare(method.exportAuctions, 'xml'),
+  respond
+);
+
 // Get auction by id
 router.route('/:id').get(
   authenticate,

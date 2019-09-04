@@ -23,6 +23,7 @@
       </v-list-item>
     </v-list>
     <v-btn block :disabled="!anySelected" @click="approveUsers" color="primary">Approve selected</v-btn>
+    <v-btn block @click="exportUsers" color="primary"><v-icon>mdi-download</v-icon>Export auctions</v-btn>
   </v-flex>
 </template>
 
@@ -95,6 +96,17 @@ import ApiService from '../services/api.service';
           } else {
             console.log('Failed to approve user:', user.id);
           }
+        });
+      },
+
+      exportUsers: function() {
+        ApiService.get('/auctions/export').then((response) => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'Auctions.xml');
+          document.body.appendChild(link);
+          link.click();
         });
       }
     }

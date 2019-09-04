@@ -5,8 +5,14 @@ const respond = (_req: Request, res: Response, _next: RequestHandler) => {
   res.status(res.locals.code);
   const headers = res.locals.headers;
   const content = res.locals.content;
-  res.set(headers);
-  res.json(content);
+  const type = res.locals.type;
+  if (type === 'xml') {
+    res.set(headers);
+    res.send(content);
+  } else {
+    res.set(headers);
+    res.json(content);
+  }
 };
 
 export = respond;

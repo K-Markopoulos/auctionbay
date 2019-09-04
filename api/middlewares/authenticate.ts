@@ -1,10 +1,10 @@
-import { Request, Response, RequestHandler} from 'express';
+import { Request, Response, NextFunction} from 'express';
 import errors = require('../common/errors');
 import tokens = require('../common/tokens');
 import User, { IUser } from '../models/user';
 
 // Authenticates the request by verifying the header token
-const authenticate = (req: Request, res: Response, next: any) => {
+const authenticate = (req: Request, res: Response, next: NextFunction) => {
   // Check headers
   if (!req.headers || !req.headers.authorization) {
     console.info('No authorization headers');

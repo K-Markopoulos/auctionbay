@@ -1,4 +1,5 @@
 import fs = require('fs');
+import xml = require('xmlbuilder');
 import User, { IUser }from '../models/user';
 import Auction, { IAuction, IBid }from '../models/auction';
 import errors = require('../common/errors');
@@ -91,7 +92,36 @@ const _addImages = async (input: any, auction: IAuction) => {
   const files = await Promise.all(_moveImages(input.files, path));
   auction.images = files;
   console.log(files);
-}
+};
+
+const _createXML = (auctions) => {
+  const doc = xml.create('Items');
+  auctions.map(auction => auction.toJSON()).forEach(auction => {
+    const item = doc.ele('Item', { ItemID: auction.id });
+    item.ele('Name', auction.name);
+    auction.category.forEach(cat => item.ele('Category', cat));
+    item.ele('Currently', auction.current);
+    item.ele('First_bid', auction.firstBid);
+    item.ele('Number_of_bids', auction.bids.length);
+    const bids = item.ele('Bids');
+    auction.bids.forEach(bid => {
+      bids.ele('Bid')
+        .ele('Bidder', { Rating: bid.bidder.bidderRating.avg, UserID: bid.bidder.id })
+          .ele('Location', bid.bidder.location.address).up()
+          .ele('Country', bid.bidder.location.country).up()
+        .up()
+        .ele('Time', bid.time).up()
+        .ele('Amount', bid.amount).up()
+    });
+    item.ele('Location', auction.location.address);
+    item.ele('Country', auction.location.country);
+    item.ele('Started', auction.started);
+    item.ele('Ends', auction.ends);
+    item.ele('Seller', { Rating: auction.seller.sellerRating.avg, UserID: auction.seller.id });
+  });
+  
+  return doc.end({ pretty: true });
+};
 
 const createAuction = async (input) => {
   const newAuction = {
@@ -131,6 +161,11 @@ const getAllAuctions = async (input) => {
   }
 };
 
+const exportAuctions = async (input) => {
+  const auctions = await Auction.find({});
+  return _createXML(auctions);
+};
+
 const updateAuction = async (input) => {
   const changes = {
     name: input.name,
@@ -159,6 +194,7 @@ const placeBid = async (input) => {
 
 export = {
   createAuction,
+  exportAuctions,
   getAuction,
   getAllAuctions,
   updateAuction,
