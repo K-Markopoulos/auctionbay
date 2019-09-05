@@ -32,6 +32,30 @@ const parseImages = (property: string) => {
   };
 };
 
+const parseSingle = (property: string) => {
+  return (req: Request, res: Response, next:NextFunction) => {
+    upload.single('avatar')(req, res, (error) => {
+      if (error) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+          next(new errors.BadRequestError('FILE_TOO_LARGE'));
+        } else if (error.code === 'LIMIT_UNEXPECTED_FILE') {
+          // ignore error
+          next();
+        } else {
+          next(error);
+        }
+      } else {
+        // Deserialize input
+        if (property && typeof req.body[property] == 'string') {
+          req.body = JSON.parse(req.body[property]);
+        }
+        next();
+      }
+    });
+  };
+};
+
 export = {
-  parseImages
+  parseImages,
+  parseSingle
 };

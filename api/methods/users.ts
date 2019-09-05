@@ -3,6 +3,7 @@ import errors = require('../common/errors');
 import bcrypt = require('bcrypt');
 import tokens = require('../common/tokens');
 import enums = require('../models/enums');
+import Files = require('../common/files');
 
 const _validate = async (user: IUser): Promise<IUser> => {
   const sameEmailUser = await User.findOne({ email: user.email });
@@ -14,6 +15,21 @@ const _validate = async (user: IUser): Promise<IUser> => {
     throw new errors.BadRequestError('USERNAME_ALREADY_EXISTS');
   }
   return user;
+};
+
+const _validateNewEmail = async (input: any): Promise<void> => {
+  const sameEmailUser = await User.findOne({ _id: { $ne: input.accessor._id }, email: input.email });
+  if (sameEmailUser) {
+    throw new errors.BadRequestError('EMAIL_ALREADY_EXISTS');
+  }
+};
+
+const _addAvatar = async (input: any) => {
+  if (!input.file) {
+    return;
+  }
+  const files = await Promise.all(Files.move([input.file], process.env.UPLOAD_FILE_PATH));
+  return files[0];
 };
 
 const getAllUsers = async (input) => {
@@ -40,14 +56,25 @@ const updateUser = async (input) => {
     lastName: input.lastName,
     location: input.location,
     phoneNumber: input.phoneNumber,
-    taxId: input.taxId
+    taxId: input.taxId,
+    avatar: null
   };
   Object.keys(changes).forEach(x => {
     if (!changes[x]) {
       delete changes[x];
     }
   });
+  if (changes.email) {
+    await _validateNewEmail(input);
+  }
+  console.log(input);
+  const avatar = await _addAvatar(input);
+  if (avatar) {
+    changes.avatar = avatar;
+  }
+  console.log('Avatar', avatar);
   const user = await User.findByIdAndUpdate(input.id, changes, { new: true });
+  console.info('Updated user ', user.username);
   return user.toJSON();
 };
 

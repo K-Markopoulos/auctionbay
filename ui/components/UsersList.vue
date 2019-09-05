@@ -10,10 +10,12 @@
           <v-checkbox :disabled="isApproved(user)" v-model="user.selected"></v-checkbox>
         </v-list-item-action>
 
-        <v-list-item-content>
-          <v-list-item-title v-text="user.username"></v-list-item-title>
-          <v-list-item-subtitle v-text="user.firstName + ' ' + user.lastName"></v-list-item-subtitle>
-          <v-list-item-subtitle v-text="userDetails(user)"></v-list-item-subtitle>
+        <v-list-item-content >
+          <router-link :to="getLink(user)" tag="div" style="cursor: pointer">
+            <v-list-item-title v-text="user.username"></v-list-item-title>
+            <v-list-item-subtitle v-text="user.firstName + ' ' + user.lastName"></v-list-item-subtitle>
+            <v-list-item-subtitle v-text="userDetails(user)"></v-list-item-subtitle>
+          </router-link>
         </v-list-item-content>
         
         <v-list-item-action>
@@ -49,6 +51,9 @@ import ApiService from '../services/api.service';
       },
       anySelected() {
         return this.users.some(x => x.selected);
+      },
+      getLink() {
+        return (user) => `/users/${user.id}`;
       }
     },
     mounted() {

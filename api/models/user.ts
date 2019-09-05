@@ -1,7 +1,8 @@
 import mongoose  = require('mongoose');
 import enums = require('./enums');
 import LocationSchema, { ILocation } from './location';
-import RatingSchema, { IRating } from './rating';
+import RatingSchema, { IRating, DefaultRatingSchema } from './rating';
+import FileSchema, { IFile } from './files';
 
 export interface IUser extends mongoose.Document{
   username: string,
@@ -16,6 +17,7 @@ export interface IUser extends mongoose.Document{
   status: string,
   sellerRating: IRating,
   bidderRating: IRating,
+  avatar: IFile,
   createdAt: Date,
   updatedAt: Date,
   lastLogin: Date,
@@ -87,12 +89,21 @@ export const UserSchema = new mongoose.Schema<IUser>({
 
   // The user's rating as a seller
   sellerRating: {
-    type: RatingSchema
+    type: RatingSchema,
+    required: true,
+    default: DefaultRatingSchema
   },
 
   // The user's rating as a bidder
   bidderRating: {
-    type: RatingSchema
+    type: RatingSchema,
+    required: true,
+    default: DefaultRatingSchema
+  },
+
+  // The user's avatar image
+  avatar: {
+    type: FileSchema
   },
 
   // Created timestamp
@@ -116,6 +127,9 @@ export const UserSchema = new mongoose.Schema<IUser>({
   }
 });
 
+// Used to populate these fields
+export const SellerSummary = 'username avatar sellerRating location';
+
 UserSchema.pre<IUser>('save', function(next) {
   this.updatedAt = new Date();
   return next();
@@ -134,7 +148,8 @@ UserSchema.methods.toJSON = function() {
     role: this.role,
     status: this.status,
     sellerRating: this.sellerRating,
-    bidderRating: this.bidderRating
+    bidderRating: this.bidderRating,
+    avatar: this.avatar
   };
 };
 

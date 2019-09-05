@@ -6,6 +6,7 @@ import guard = require('../middlewares/guards');
 import respond = require('../middlewares/respond');
 import method = require('../methods/users');
 import prepare = require('../middlewares/prepare');
+import upload = require('../middlewares/multipart');
 
 const router = express.Router();
 
@@ -153,6 +154,7 @@ router.route('/:id').get(
 router.route('/:id').post(
   authenticate,
   guard.asSelf(),
+  upload.parseSingle('user'),
   validate(updateUserSchema),
   prepare(method.updateUser),
   respond

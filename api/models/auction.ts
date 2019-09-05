@@ -15,7 +15,8 @@ export interface IBid extends mongoose.Document{
 const BidSchema = new mongoose.Schema<IBid>({
 
   bidder: {
-    type: UserSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
 
@@ -106,7 +107,8 @@ const AuctionSchema = new mongoose.Schema<IAuction>({
 
   // The creator of the auction
   seller: {
-    type: UserSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
 

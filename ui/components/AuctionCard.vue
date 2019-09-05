@@ -20,7 +20,7 @@
       <v-avatar class="mr-2" size="30" color="grey">
         <v-img
           class="elevation-4"
-          src=""
+          :src="getUserAvatar"
         ></v-img>
       </v-avatar>
       <span v-text="getSellerDisplayName"></span>
@@ -33,6 +33,7 @@
         align="center"
         justify="end"
         class="ma-0"
+        style="width: -webkit-fill-available;"
       >
         <span v-if="auction.buyPrice">
           <v-icon class="mr-1">mdi-cash</v-icon>
@@ -52,7 +53,7 @@
     props: [ 'auction' ],
     data () {
       return {
-        
+
       }
     },
 
@@ -62,7 +63,7 @@
       },
 
       getHeaderImg: function() {
-        return this.auction.images.length
+        return this.auction.images && this.auction.images.length
           ? `/uploads/${this.auction.id}/${this.auction.images[0].fid}`
           : '/assets/no-photo-available.png';
       },
@@ -85,6 +86,12 @@
 
       getBidDetails: function() {
         return `${this.auction.current}$ (${this.auction.bids.length})`
+      },
+
+      getUserAvatar: function() {
+        return this.auction.seller.avatar &&
+          `/uploads/${this.auction.seller.avatar.fid}`||
+          this.$defaultAvatar;
       }
     },
     methods: {

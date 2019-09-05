@@ -4,7 +4,10 @@ const prepare = (method: Function, type: string = 'json') => {
   return (req: Request, res: Response, next: NextFunction) => {
     const input = Object.assign({}, req.params, req.query, req.body);
     if (req.files) {
-      input.files = req.files
+      input.files = req.files;
+    }
+    if (req.file) {
+      input.file = req.file;
     }
     input.accessor = res.locals.accessor;
       return method(input).then((result) => {

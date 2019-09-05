@@ -44,6 +44,8 @@ Vue.prototype.$categories = [
   "Wine",
 ];
 
+Vue.prototype.$defaultAvatar = '/assets/user-avatar.png';
+
 new Vue({
   vuetify,
   router,

@@ -18,6 +18,8 @@
           <v-icon v-on="on">mdi-menu-down</v-icon>
         </template>
         <v-list>
+         <v-list-item to="/profle" v-if="isLoggedIn()">Profile</v-list-item>
+         <v-divider></v-divider>
          <v-list-item @click="logout" v-if="isLoggedIn()">Logout</v-list-item>
         </v-list>
       </v-menu>

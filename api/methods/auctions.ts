@@ -1,9 +1,9 @@
 import fs = require('fs');
 import xml = require('xmlbuilder');
-import User, { IUser }from '../models/user';
+import User, { IUser, SellerSummary }from '../models/user';
 import Auction, { IAuction, IBid }from '../models/auction';
 import errors = require('../common/errors');
-import { IFile } from '../models/files';
+import Files = require('../common/files');
 
 const _validateBid = (input: any, auction: IAuction) => {
   const bid = {
@@ -66,30 +66,12 @@ const _getQueryOptions = (input: any) => {
   }
 };
 
-const _moveImages = (files: any[], path): Promise<IFile>[] => {
-  !fs.existsSync(path) && fs.mkdirSync(path);
-  return files.map(file => {
-    const newPath =  `${path}/${file.filename}`;
-    return new Promise((resolve, reject) => {
-      fs.rename(file.path,newPath, (error) => {
-        if (error) {
-          console.log('Error on moving files');
-          reject(error);
-        }
-        console.info(`Create new file ${newPath}`);
-        resolve({ name: file.originalname, fid: file.filename });
-      });
-    })
-    
-  })
-}
-
 const _addImages = async (input: any, auction: IAuction) => {
   if (!input.files) {
     return;
   }
   const path = `${process.env.UPLOAD_FILE_PATH}/${auction.id}`;
-  const files = await Promise.all(_moveImages(input.files, path));
+  const files = await Promise.all(Files.move(input.files, path));
   auction.images = files;
   console.log(files);
 };
@@ -132,7 +114,7 @@ const createAuction = async (input) => {
     ends: input.ends,
     location: input.location,
     description: input.description,
-    seller: input.accessor
+    seller: input.accessor._id
   }
   const auction = new Auction(newAuction);
   await _addImages(input, auction);
@@ -153,7 +135,7 @@ const getAuction = async (input) => {
 const getAllAuctions = async (input) => {
   const filters = _getQueryFilters(input);
   const options = _getQueryOptions(input);
-  const auctions = await Auction.find(filters,{}, options);
+  const auctions = await Auction.find(filters,{}, options).populate('seller', SellerSummary);
   const auctionsCount = await Auction.countDocuments(filters);
   return {
     data: auctions.map((auction: IAuction) => auction.toJSON()),

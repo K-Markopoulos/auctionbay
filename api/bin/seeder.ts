@@ -24,7 +24,7 @@ mongoose.connect(uri, {
 }).then(() => {
   return populateUsers();
 }).then((users) => {
-  return populateAuctions(users[0])
+  return populateAuctions(users)
 }).then(() => {
   console.log('Done');
   process.exit();
@@ -68,10 +68,10 @@ const populateUsers = async () => {
   });
 };
 
-const populateAuctions = async (seller) => {
+const populateAuctions = async (users) => {
   return Promise.all([
     // create Auctions
-    ...[...Array(30)].map(() => helpers.createAuction({ seller: seller })),
+    ...[...Array(30)].map((x,i) => helpers.createAuction({ seller: users[i % users.length]._id })),
   ]).then(all => {
     all.forEach(auction => {
       console.log(`Created Auction: ${auction.name}'`);

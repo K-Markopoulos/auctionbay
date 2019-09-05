@@ -46,7 +46,7 @@ const createUser = async (overrides?: any) => {
     firstName: faker.name.findName(),
     lastName: faker.name.lastName(),
     location: createLocation(),
-    phoneNumber: faker.phone.phoneNumber(),
+    phoneNumber: faker.phone.phoneNumberFormat().split('-').join(''),
     taxId: faker.random.number(),
     role: enums.Role.REGISTERED,
     status: enums.Status.APPROVED,

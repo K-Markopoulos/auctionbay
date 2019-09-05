@@ -240,6 +240,7 @@
 
       onSuccess: function(res) {
         const id = res.data.id;
+        this.onSubmit();
         this.$router.push(`/auctions/${id}`);
       },
 
