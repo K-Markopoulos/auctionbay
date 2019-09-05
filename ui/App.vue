@@ -8,17 +8,17 @@
     <v-toolbar-items v-if="isLoggedIn()">
       <v-btn to="/" text> Home </v-btn>
       <v-btn to="/auctions" text> Auctions </v-btn>
-      <v-btn to="/users" text> Users </v-btn>
+      <v-btn to="/users" v-if="isAdmin" text> Users </v-btn>
       <v-icon @click="openNewAuctionForm = true">mdi-plus</v-icon>
       <v-avatar id="user-avatar" size="30">
-        <v-img src="" class="elevation-1"></v-img>
+        <v-img :src="getUserAvatar" class="elevation-1"></v-img>
       </v-avatar>
       <v-menu bottom offset-y>
         <template v-slot:activator="{ on }">
           <v-icon v-on="on">mdi-menu-down</v-icon>
         </template>
         <v-list>
-         <v-list-item to="/profle" v-if="isLoggedIn()">Profile</v-list-item>
+         <v-list-item :to="getUserProfile" v-if="isLoggedIn()">Profile</v-list-item>
          <v-divider></v-divider>
          <v-list-item @click="logout" v-if="isLoggedIn()">Logout</v-list-item>
         </v-list>
@@ -52,6 +52,22 @@ export default {
     }
   },
 
+  computed: {
+    getUserProfile() {
+      return `/users/${TokenService.getUserID()}`;
+    },
+
+    getUserAvatar() {
+      return this.$user.avatar &&
+        `/uploads/${this.$user.avatar.fid}`||
+        this.$defaultAvatar;
+    },
+
+    isAdmin() {
+      return this.$user.role === 'ADMINISTRATOR';
+    }
+  },
+
   methods: {
     isLoggedIn() {
       return !!TokenService.getToken();
@@ -59,6 +75,7 @@ export default {
 
     logout() {
       TokenService.removeToken();
+      TokenService.removeUserID();
       this.$router.push('/login');
     },
 

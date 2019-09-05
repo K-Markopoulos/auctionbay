@@ -73,6 +73,7 @@
 
       onSuccess: function(res) {
         TokenService.saveToken(res.data.token);
+        TokenService.saveUserID(res.data._id);
         ApiService.setHeader();
         console.log('Logged in');
 

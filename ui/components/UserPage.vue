@@ -89,9 +89,9 @@
 
     <v-divider></v-divider>
 
-    <v-card-actions flex>
+    <v-card-actions flex v-if="isSameUser">
       <v-btn class="flex-grow-1" v-if="!editMode" @click="editMode = true" color="primary">Edit</v-btn>
-      <v-btn class="flex-grow-1" v-if="editMode" @click="editMode = false; getUser()" text>Cancel</v-btn>
+      <v-btn class="flex-grow-1" v-if="editMode" @click="editMode = false; avatarPreview = null; getUser()" text>Cancel</v-btn>
       <v-btn class="flex-grow-1" v-if="editMode" @click="submitChanges" color="success">Save</v-btn>
     </v-card-actions>
   </v-card>
@@ -134,6 +134,9 @@ import ApiService from '../services/api.service';
         return this.avatarPreview || this.user.avatar
           && `/uploads/${this.user.avatar.fid}`
           || this.$defaultAvatar
+      },
+      isSameUser() {
+        return this.$user.id === this.user.id;
       }
     },
     methods: {

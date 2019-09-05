@@ -5,15 +5,6 @@ import vuetify from './plugins/vuetify'
 import ApiService from './services/api.service'
 import TokenService from './services/token.service'
 
-// Set the base URL of the API
-// ApiService.init(process.env.API_BASE_URL)
-ApiService.init('https://localhost:8888/api');
-
-// If token exists set header
-if (TokenService.getToken()) {
-  ApiService.setHeader()
-}
-
 Vue.prototype.$categories = [
   "Antiques",
   "Art",
@@ -45,9 +36,30 @@ Vue.prototype.$categories = [
 ];
 
 Vue.prototype.$defaultAvatar = '/assets/user-avatar.png';
+Vue.prototype.$user = {};
 
-new Vue({
-  vuetify,
-  router,
-  render: h => h(App)
-}).$mount('#app');
+// Set the base URL of the API
+// ApiService.init(process.env.API_BASE_URL)
+ApiService.init('https://localhost:8888/api');
+
+// If token exists set header
+if (TokenService.getToken()) {
+  ApiService.setHeader();
+  ApiService.get(`/users/${TokenService.getUserID()}`).then(res => {
+    Vue.prototype.$user = res.data;
+    
+    new Vue({
+      vuetify,
+      router,
+      render: h => h(App)
+    }).$mount('#app');
+  })
+} else {
+  new Vue({
+    vuetify,
+    router,
+    render: h => h(App)
+  }).$mount('#app');
+}
+
+
