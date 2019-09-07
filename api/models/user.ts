@@ -3,6 +3,7 @@ import enums = require('./enums');
 import LocationSchema, { ILocation } from './location';
 import RatingSchema, { IRating, DefaultRatingSchema } from './rating';
 import FileSchema, { IFile } from './files';
+import { IMessage } from './message';
 
 export interface IUser extends mongoose.Document{
   username: string,
@@ -18,6 +19,7 @@ export interface IUser extends mongoose.Document{
   sellerRating: IRating,
   bidderRating: IRating,
   avatar: IFile,
+  messages: IMessage[],
   createdAt: Date,
   updatedAt: Date,
   lastLogin: Date,
@@ -105,6 +107,12 @@ export const UserSchema = new mongoose.Schema<IUser>({
   avatar: {
     type: FileSchema
   },
+
+  // The user's messages and notifications
+  messages: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Message'
+  }],
 
   // Created timestamp
   createdAt: {

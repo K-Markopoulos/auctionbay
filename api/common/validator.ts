@@ -8,9 +8,9 @@ export interface IExtendedJoi extends joi.Root {
 export const validator: IExtendedJoi = joi.extend({
   name: 'objectId',
   base: joi.string(),
-  pre: (value,state, prefs) => {
+  pre: function(value, state, prefs) {
     if(!mongoose.Types.ObjectId.isValid(value)) {
-      return this.createError('INVALID_ID', value, {}, state, prefs);
+      return this.createError('INVALID_ID', {} , state, prefs);
     }
     return value;
   }

@@ -10,7 +10,13 @@ const Status = {
   APPROVED: 'APPROVED'
 }
 
+const MessageType = {
+  MESSAGE: 'MESSAGE',
+  NOTIFICATION: 'NOTIFICATION'
+}
+
 export = {
   Role,
-  Status
+  Status,
+  MessageType
 }
