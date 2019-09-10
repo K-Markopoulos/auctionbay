@@ -2,6 +2,7 @@ import faker = require('faker');
 import bcrypt = require('bcrypt');
 import User, { IUser } from '../models/user';
 import Auction, { IAuction, IBid } from '../models/auction';
+import Message, { IMessage } from '../models/message';
 import enums = require('../models/enums');
 import mongoose = require('mongoose');
 
@@ -60,6 +61,24 @@ const createUser = async (overrides?: any) => {
   return user.save();
 };
 
+const defaultHash = bcrypt.hashSync('Ultra_secret', 10);
+const getUsersFields = username => {
+  return {
+    username: username,
+    email: faker.internet.email(),
+    password: defaultHash,
+    firstName: faker.name.findName(),
+    lastName: faker.name.lastName(),
+    location: createLocation(),
+    phoneNumber: faker.phone.phoneNumberFormat().split('-').join(''),
+    taxId: faker.random.number(),
+    role: enums.Role.REGISTERED,
+    status: enums.Status.APPROVED,
+    sellerRating: createRating(),
+    bidderRating: createRating(),
+  };
+};
+
 const createAuction = async (overrides?: any) => {
   const details = {
     name: faker.commerce.productName(),
@@ -81,9 +100,48 @@ const createAuction = async (overrides?: any) => {
   return auction.save();
 }
 
+const createNotification = async (overrides?: any) => {
+  const details = {
+    type: enums.MessageType.NOTIFICATION,
+    body: faker.lorem.sentences(),
+    to: mongoose.Types.ObjectId,
+    ...overrides
+  };
+
+  const notification = new Message(details);
+  await notification.save();
+  await User.findByIdAndUpdate(details.to, {
+    $push: { messages: notification._id }
+  });
+  return notification;
+}
+
+const createMessage = async (overrides?: any) => {
+  const details = {
+    type: enums.MessageType.MESSAGE,
+    body: faker.lorem.sentences(),
+    from: mongoose.Types.ObjectId,
+    to: mongoose.Types.ObjectId,
+    ...overrides
+  };
+
+  const message = new Message(details);
+  await message.save();
+  await User.findByIdAndUpdate(details.from, {
+    $push: { messages: message._id }
+  });
+  await User.findByIdAndUpdate(details.to, {
+    $push: { messages: message._id }
+  });
+  return message;
+}
+
 export = {
   createLocation,
   createUser,
+  getUsersFields,
   createAuction,
-  createBid
+  createBid,
+  createNotification,
+  createMessage
 }

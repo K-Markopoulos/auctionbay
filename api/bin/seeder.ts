@@ -17,14 +17,13 @@ mongoose.connect(uri, {
   useNewUrlParser: true
 }).then(() => {
   console.info(`System connected to the database @ ${uriwa}.`);
-}).then(() => {
-  return mongoose.connection.collections.users.deleteMany({});
-}).then(() => {
-  return mongoose.connection.collections.auctions.deleteMany({});
-}).then(() => {
-  return populateUsers();
-}).then((users) => {
-  return populateAuctions(users)
+}).then(async () => {
+  await mongoose.connection.collections.users.deleteMany({});
+  await mongoose.connection.collections.auctions.deleteMany({});
+  await mongoose.connection.collections.messages.deleteMany({});
+  const users = await populateUsers();
+  const auctions = await populateAuctions(users);
+  const messages = await populateMessages(users);
 }).then(() => {
   console.log('Done');
   process.exit();
@@ -75,6 +74,33 @@ const populateAuctions = async (users) => {
   ]).then(all => {
     all.forEach(auction => {
       console.log(`Created Auction: ${auction.name}'`);
+    });
+  });
+};
+
+const populateMessages = async (users) => {
+  let promises = [];
+
+  users.forEach(user => [...Array(10)].forEach(() => {
+    
+    // create 10 Notifications per user
+    promises.push(helpers.createNotification({ to: user._id }));
+
+    // create 10 Received message per user
+    promises.push(helpers.createMessage({
+      to: user._id,
+      from: users[Math.ceil(Math.random() * 10) % users.length]._id
+    }));
+
+    // create 10 Sent message per user
+    promises.push(helpers.createMessage({
+      from: user._id,
+      to: users[Math.ceil(Math.random() * 10) % users.length]._id
+    }));
+  }));
+  return Promise.all(promises).then(all => {
+    all.forEach(message => {
+      console.log(`Created Message: ${message.id}\n\tFrom: ${message.from && message.from._id}\n\tTo: ${message.to._id}'`);
     });
   });
 };

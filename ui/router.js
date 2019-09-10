@@ -8,6 +8,7 @@ import AuctionsList from './components/AuctionsList'
 import AuctionPage from './components/AuctionPage'
 import UsersList from './components/UsersList'
 import UserPage from './components/UserPage'
+import MessagesPage from './components/MessagesPage'
 
 Vue.use(VueRouter);
 
@@ -50,6 +51,10 @@ const router = new VueRouter({
       path: '/users/:id',
       component: UserPage,
       props: true
+    },
+    {
+      path: '/messages',
+      component: MessagesPage
     },
     {
       path: '*',
