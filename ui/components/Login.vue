@@ -75,7 +75,7 @@
       onSuccess: function(res) {
         store.commit('set', res.data);
         TokenService.saveToken(res.data.token);
-        TokenService.saveUserID(res.data.id);
+        TokenService.saveUserID(res.data._id);
         ApiService.setHeader();
         console.log('Logged in');
 

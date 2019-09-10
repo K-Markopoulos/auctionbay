@@ -75,7 +75,7 @@ describe('Test users routes', function() {
 
       p.should.have.status(200);
       p.body.should.have.property('token');
-      p.body.should.have.property('_id');
+      p.body.should.have.property('id');
     });
 
     it('should not authenticate a user with wrong input', async () => {

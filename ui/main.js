@@ -6,6 +6,8 @@ import ApiService from './services/api.service'
 import TokenService from './services/token.service'
 import store from './services/store.service'
 
+Vue.prototype.$defaultAvatar = '/assets/user-avatar.png';
+
 Vue.prototype.$categories = [
   "Antiques",
   "Art",
@@ -37,6 +39,7 @@ Vue.prototype.$categories = [
 ];
 
 Vue.prototype.$defaultAvatar = '/assets/user-avatar.png';
+Vue.prototype.$user = {};
 
 // Set the base URL of the API
 ApiService.init('https://localhost:8888/api');

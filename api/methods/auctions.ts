@@ -124,7 +124,7 @@ const createAuction = async (input) => {
 };
 
 const getAuction = async (input) => {
-  const auction = await Auction.findById(input.id);
+  const auction = await Auction.findById(input.id).populate('seller', SellerSummary);
   if (!auction) {
     console.info(`Auction with id ${input.id} not found`);
     throw new errors.NotFoundError();
@@ -162,7 +162,7 @@ const updateAuction = async (input) => {
     }
   });  
   const auction = await Auction.findByIdAndUpdate(input.id, changes, { new: true });
-  console.log('Updated auction ', input.id);
+  console.info('Updated auction ', input.id);
   return auction.toJSON();
 };
 
