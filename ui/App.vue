@@ -18,9 +18,10 @@
           <v-icon v-on="on">mdi-menu-down</v-icon>
         </template>
         <v-list>
-         <v-list-item :to="getUserProfile" v-if="isLoggedIn()">Profile</v-list-item>
+         <v-list-item :to="getUserProfileLink">Profile</v-list-item>
+         <v-list-item :to="getUserMessagesLink">Messages</v-list-item>
          <v-divider></v-divider>
-         <v-list-item @click="logout" v-if="isLoggedIn()">Logout</v-list-item>
+         <v-list-item @click="logout">Logout</v-list-item>
         </v-list>
       </v-menu>
     </v-toolbar-items>
@@ -39,6 +40,7 @@
 <script>
 import TokenService from './services/token.service';
 import CreateAuctionFrom from './components/CreateAuctionForm';
+import store from './services/store.service';
 
 export default {
   name: 'app',
@@ -53,18 +55,25 @@ export default {
   },
 
   computed: {
-    getUserProfile() {
+    user() {
+      return store.state.user;
+    },
+    getUserProfileLink() {
       return `/users/${TokenService.getUserID()}`;
     },
 
+    getUserMessagesLink() {
+      return `/messages/`;
+    },
+
     getUserAvatar() {
-      return this.$user.avatar &&
-        `/uploads/${this.$user.avatar.fid}`||
+      return this.user.avatar &&
+        `/uploads/${this.user.avatar.fid}`||
         this.$defaultAvatar;
     },
 
     isAdmin() {
-      return this.$user.role === 'ADMINISTRATOR';
+      return this.user.role === 'ADMINISTRATOR';
     }
   },
 

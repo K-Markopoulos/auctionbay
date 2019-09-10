@@ -99,6 +99,7 @@
 
 <script>
 import ApiService from '../services/api.service';
+import store from '../services/store.service';
   export default {
     name: 'UserPage',
     props: [ 'id' ],
@@ -136,7 +137,7 @@ import ApiService from '../services/api.service';
           || this.$defaultAvatar
       },
       isSameUser() {
-        return this.$user.id === this.user.id;
+        return this.user.id === this.user.id;
       }
     },
     methods: {

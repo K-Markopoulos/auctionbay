@@ -108,8 +108,8 @@ const authenticateUser = async (input) => {
   user.lastLogin = new Date();
   return user.save().then((u: IUser) => {
     return {
-      token,
-      _id: u._id
+      ...u.toJSON(),
+      token
     }
   });
 };

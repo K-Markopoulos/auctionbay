@@ -44,6 +44,7 @@
 <script>
   import ApiService from '../services/api.service';
   import TokenService from '../services/token.service';
+  import store from '../services/store.service';
 
   export default {
     name: 'Login',
@@ -72,8 +73,9 @@
       },
 
       onSuccess: function(res) {
+        store.commit('set', res.data);
         TokenService.saveToken(res.data.token);
-        TokenService.saveUserID(res.data._id);
+        TokenService.saveUserID(res.data.id);
         ApiService.setHeader();
         console.log('Logged in');
 
