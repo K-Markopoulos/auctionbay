@@ -160,14 +160,16 @@ const updateAuction = async (input) => {
     if (!changes[x]) {
       delete changes[x];
     }
-  });  
-  const auction = await Auction.findByIdAndUpdate(input.id, changes, { new: true });
+  });
+  
+  const auction = await Auction.findByIdAndUpdate(input.id, changes, { new: true })
+    .populate('seller', SellerSummary);
   console.info('Updated auction ', input.id);
   return auction.toJSON();
 };
 
 const placeBid = async (input) => {
-  const auction = await Auction.findById(input.id);
+  const auction = await Auction.findById(input.id).populate('seller', SellerSummary);
   const bid = _validateBid(input, auction);
   auction.bids.unshift(bid as IBid);
   auction.bidsCount += 1;

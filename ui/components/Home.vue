@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%;">
+  <div style="width: 100%; align-self: flex-start;">
     <v-parallax class="stick-to-top" dark height="300" :src="banner">
       <v-row align="center" justify="center" class="banner-text">
         <h1 class="display-2 font-weight-thin mb-4">Welcome to Auction Bay</h1>

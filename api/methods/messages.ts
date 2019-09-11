@@ -34,8 +34,11 @@ const sendMessage = async (input) => {
 };
 
 const getAllMessages = async (input) => {
-  const { messages } = await User.findById(input.accessor._id, 'messages')
-    .populate({
+  const { messages } = await User.findById(input.accessor._id, 'messages', {
+    sort: {
+        createdAt: 1
+    }
+  }).populate({
       path: 'messages',
       model: 'Message',
       populate: {

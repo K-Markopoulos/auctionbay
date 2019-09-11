@@ -100,6 +100,7 @@
 <script>
 import ApiService from '../services/api.service';
 import store from '../services/store.service';
+
   export default {
     name: 'UserPage',
     props: [ 'id' ],
@@ -165,6 +166,7 @@ import store from '../services/store.service';
           this.avatarPreview = null;
           this.editMode = false;
           this.user = res.data;
+          store.commit('set', res.data);
         }).catch(err => {
           console.log(err);
         });

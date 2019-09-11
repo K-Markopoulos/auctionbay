@@ -22,6 +22,7 @@
                 <v-list-item-content>
                   <v-list-item-title class="message-title" v-text="getMessageTitle(message, folder.field)"></v-list-item-title>
                   <v-list-item-subtitle class="message-subtitle" v-text="getMessageSubtitle(message)"></v-list-item-subtitle>
+                  <v-list-item-subtitle class="message-time" v-text="getTime(message)"></v-list-item-subtitle>
                 </v-list-item-content>
 
               </v-list-item>
@@ -86,6 +87,9 @@ import store from '../services/store.service';
       getMessageSubtitle() {
         return (message) => message.body;
       },
+      getTime() {
+        return (message) => moment(message.createdAt).fromNow();
+      },
       getUserAvatarByField() {
         return (message, field) => {
           return message[field].avatar &&
@@ -143,6 +147,11 @@ import store from '../services/store.service';
 }
 
 .message-subtitle{
+  text-align: start;
+}
+
+.message-time{
+  padding-top: 3px;
   text-align: start;
 }
 

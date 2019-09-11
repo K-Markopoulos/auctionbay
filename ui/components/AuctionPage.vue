@@ -2,7 +2,7 @@
   <v-container fluid fill-height v-if="auction">
     <v-row style="align-self: flex-start;">
       <v-col cols="8">
-        <div class="elevation-1 grey lighten-4 mb-5">
+        <div class="elevation-1 grey lighten-3 mb-5">
           <div v-if="!hasImages()" class="no-image">
             No image available
           </div>
@@ -57,7 +57,7 @@
             </v-card-actions>
             </div>
         </div>
-        <div class="elevation-1 grey lighten-4 mb-5">
+        <div class="elevation-1 grey lighten-3 mb-5">
           <div class="location-container">
             <div class="location-details">
               <h2>Location: <span>{{auction.location.address}}</span></h2>
@@ -67,7 +67,7 @@
           </div>
         </div>
 
-        <div class="elevation-1 grey lighten-4 mb-5">
+        <div class="elevation-1 grey lighten-3 mb-5">
           <div class="box-container">
             <h1>Description</h1>
             <v-divider></v-divider>
@@ -368,6 +368,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  border: 1px solid black;
+  border-radius: 5px;
 }
 
 #locationMap > div {
