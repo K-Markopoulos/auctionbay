@@ -51,7 +51,7 @@ const getAuction = {
 const updateAuction = {
   body: {
     name: validator.string().optional(),
-    category: validator.string().optional(),
+    category: validator.array().items(validator.string()).optional(),
     location: validator.object({
       address: validator.string().required(),
       country: validator.string().required(),
@@ -59,7 +59,14 @@ const updateAuction = {
       lon: validator.string().optional(),
     }).optional(),
     description: validator.string().optional(),
-    images: validator.string().optional()
+    images: validator.array().items(validator.string().optional()).max(10).optional(),
+    removedImages: validator.array().items(validator.string().optional()).optional()
+  }
+};
+
+const deleteAuction = {
+  params: {
+    id: validator.objectId().required()
   }
 };
 
@@ -110,8 +117,18 @@ router.route('/:id').get(
 router.route('/:id').put(
   authenticate,
   guard.asOwner(),
+  upload.parseImages('auction'),
   validate(updateAuction),
   prepare(method.updateAuction),
+  respond
+);
+
+// Delete auction by id
+router.route('/:id').delete(
+  authenticate,
+  guard.asOwner(),
+  validate(deleteAuction),
+  prepare(method.deleteAuction),
   respond
 );
 

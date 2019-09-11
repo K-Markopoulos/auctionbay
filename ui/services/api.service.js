@@ -48,8 +48,15 @@ const ApiService = {
     return axios.post(resource, data, config)
   },
 
-  put(resource, data) {
-    return axios.put(resource, data)
+  put(resource, data, multipart) {
+    const config = multipart 
+      ? {
+          headers: {
+            'content-type': 'multipart/form-data'
+          }
+        }
+      : {};
+    return axios.put(resource, data, config)
   },
 
   delete(resource) {

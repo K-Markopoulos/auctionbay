@@ -29,6 +29,15 @@ const _validateBid = (input: any, auction: IAuction) => {
   return bid;
 };
 
+const _validateAuctionUpdate = async (input) => {
+  const auction = await Auction.findById(input.id);
+  if (auction.bids.length > 0) {
+    console.info('Cannot modify auction with bids placed.');
+    throw new errors.BadRequestError('CANNOT_MODIFY');
+  }
+  return auction;
+}
+
 const _getQueryFilters = (input: any) => {
   const filters = {};
   if (input.name) {
@@ -72,7 +81,7 @@ const _addImages = async (input: any, auction: IAuction) => {
   }
   const path = `${process.env.UPLOAD_FILE_PATH}/${auction.id}`;
   const files = await Promise.all(Files.move(input.files, path));
-  auction.images = files;
+  auction.images.push(...files);
   console.log(files);
 };
 
@@ -149,24 +158,38 @@ const exportAuctions = async (input) => {
 };
 
 const updateAuction = async (input) => {
+  await _validateAuctionUpdate(input);
   const changes = {
     name: input.name,
     category: input.category,
     location: input.location,
     description: input.description,
-    images: input.images
-  };
+  } as any;
   Object.keys(changes).forEach(x => {
     if (!changes[x]) {
       delete changes[x];
     }
   });
-  
+  if (input.removedImages) {
+      changes.$pull = {
+        images: {
+          fid: { $in: input.removedImages }
+        }
+      }
+  }
   const auction = await Auction.findByIdAndUpdate(input.id, changes, { new: true })
     .populate('seller', SellerSummary);
-  console.info('Updated auction ', input.id);
-  return auction.toJSON();
+    await _addImages(input, auction);
+  
+    console.info('Updated auction: ', auction.name);
+    return (await auction.save()).toJSON();
 };
+
+const deleteAuction = async (input) => {
+  await _validateAuctionUpdate(input);
+  const res = await Auction.deleteOne({ _id: input.id });
+  console.log('Deleted auction', input.id, res.ok, res.n);
+}
 
 const placeBid = async (input) => {
   const auction = await Auction.findById(input.id).populate('seller', SellerSummary);
@@ -182,5 +205,6 @@ export = {
   getAuction,
   getAllAuctions,
   updateAuction,
+  deleteAuction,
   placeBid
 }
