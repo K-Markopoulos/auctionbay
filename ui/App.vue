@@ -1,12 +1,13 @@
 <template>
 <v-app>
   <v-app-bar dark>
-    <v-toolbar-title>Auction Bay</v-toolbar-title>
+    <v-toolbar-title style="cursor:pointer">
+      <router-link tag="span" to="/">Auction Bay</router-link>
+    </v-toolbar-title>
 
     <v-spacer></v-spacer>
 
     <v-toolbar-items v-if="isLoggedIn()">
-      <v-btn to="/" text> Home </v-btn>
       <v-btn to="/auctions" text> Auctions </v-btn>
       <v-btn to="/users" v-if="isAdmin" text> Users </v-btn>
       <v-icon @click="openNewAuctionForm = true">mdi-plus</v-icon>
@@ -18,12 +19,20 @@
           <v-icon v-on="on">mdi-menu-down</v-icon>
         </template>
         <v-list>
-         <v-list-item :to="getUserProfileLink">Profile</v-list-item>
-         <v-list-item :to="getUserMessagesLink">Messages</v-list-item>
-         <v-divider></v-divider>
-         <v-list-item @click="logout">Logout</v-list-item>
+        <v-list-item :to="getUserProfileLink">Profile</v-list-item>
+        <v-list-item :to="getUserMessagesLink">Messages</v-list-item>
+        <v-divider></v-divider>
+        <v-list-item @click="logout">Logout</v-list-item>
         </v-list>
       </v-menu>
+    </v-toolbar-items>
+
+    <v-toolbar-items v-if="!isLoggedIn()">
+      <v-btn to="/auctions" text> Auctions </v-btn>
+
+        <v-divider></v-divider>
+      <v-btn to="/login" text> Login </v-btn>
+      <v-btn to="/register" text> Register </v-btn>
     </v-toolbar-items>
   </v-app-bar>
 

@@ -86,7 +86,7 @@
 
           <v-card-text v-if="isActive">
             <div class="title text--primary">Highest bid: {{auction.current}}$</div>
-            <v-row class="ma-5">
+            <v-row class="ma-5" v-if="isRegistered" >
               <v-text-field cols="8" v-model="bidValue" name="bidValue" validate-on-blur
                 label="Enter your bid value" :rules="bidValueRules">
               </v-text-field>
@@ -95,7 +95,7 @@
           </v-card-text>
           <v-card-text v-if="auction.buyPrice">
             <div class="title text--primary">Buy it for: {{auction.buyPrice}}$</div>
-            <v-btn class="primary" @click="buyConfirmDialog = true">Buy it now</v-btn>
+            <v-btn v-if="isRegistered"  class="primary" @click="buyConfirmDialog = true">Buy it now</v-btn>
           </v-card-text>
         </v-card>
 
@@ -192,6 +192,7 @@
 <script>
   import ApiService from '../services/api.service';
   import LocationService from '../services/location.service';
+  import store from '../services/store.service';
 
   export default {
     name: 'AuctionPage',
@@ -215,6 +216,12 @@
     },
 
     computed: {
+      user() {
+        return store.state.user;
+      },
+      isRegistered() {
+        return !!this.user;
+      },
       isActive: function() {
         return moment(this.auction.ends) > moment();
       },

@@ -22,9 +22,13 @@ const registerData = {
 }
 
 describe('Test users routes', function() {
+  let admin;
+  let adminToken;
   beforeEach(async () => {
     // delete all users before each test
     await mongoose.connection.collections.users.deleteMany({});
+    admin = await helpers.createUser({ role: enums.Role.ADMINISTRATOR });
+    adminToken = tokens.generate({ _id: admin._id });
   })
 
   describe('POST @ /', function(){
@@ -143,8 +147,6 @@ describe('Test users routes', function() {
 
   describe('POST @ /approve', function () {
     it('should approve all requested users', async () => {
-      const admin = await helpers.createUser({ role: enums.Role.ADMINISTRATOR });
-      const adminToken = tokens.generate({ _id: admin._id });
       const pending_users = await Promise.all([
         helpers.createUser({ status: enums.Status.PENDING }),
         helpers.createUser({ status: enums.Status.PENDING }),
@@ -160,8 +162,6 @@ describe('Test users routes', function() {
     });
 
     it('should not approve unkown users', async () => {
-      const admin = await helpers.createUser({ role: enums.Role.ADMINISTRATOR });
-      const adminToken = tokens.generate({ _id: admin._id });
       const unknown_users = {
         users: await Array.of(4).map(mongoose.Types.ObjectId)
       };
@@ -190,7 +190,7 @@ describe('Test users routes', function() {
   });
 
   describe('GET @ /:id', function () {
-    it('should get user by id', async () => {
+    it('should get user by id as self', async () => {
       const user = await helpers.createUser();
       const token = tokens.generate({ _id: user._id });
       const p = await get(server, `/api/users/${user._id}`, token);
@@ -198,6 +198,24 @@ describe('Test users routes', function() {
       p.should.have.status(200);
       p.body.should.have.property('email').equals(user.email);
       p.body.should.have.property('username').equals(user.username);
+    });
+
+    it('should get user by id as admin', async () => {
+      const user = await helpers.createUser();
+      const p = await get(server, `/api/users/${user._id}`, adminToken);
+
+      p.should.have.status(200);
+      p.body.should.have.property('email').equals(user.email);
+      p.body.should.have.property('username').equals(user.username);
+    });
+
+    it('should not get user as other', async () => {
+      const user = await helpers.createUser();
+      const otherUser = await helpers.createUser();
+      const token = tokens.generate({ _id: otherUser._id });
+      const p = await get(server, `/api/users/${user._id}`, token);
+
+      p.should.have.status(403);
     });
 
     it('should not get user for unknown accessor', async () => {
@@ -246,7 +264,19 @@ describe('Test users routes', function() {
   });
 
   describe('GET @ /', function () {
-    it('should get all users', async () => {
+    it('should get all users as admin', async () => {
+      const users = await Promise.all([
+        helpers.createUser(),
+        helpers.createUser(),
+        helpers.createUser(),
+      ]);
+      const p = await get(server, '/api/users/', adminToken);
+
+      p.should.have.status(200);
+      p.body.should.be.an('array').with.length(4);
+    });
+
+    it('should not get all users as not admin', async () => {
       const users = await Promise.all([
         helpers.createUser(),
         helpers.createUser(),
@@ -255,8 +285,7 @@ describe('Test users routes', function() {
       const token = tokens.generate({ _id: users[0]._id });
       const p = await get(server, '/api/users/', token);
 
-      p.should.have.status(200);
-      p.body.should.be.an('array').with.length(3);
+      p.should.have.status(403);
     });
   });
 });

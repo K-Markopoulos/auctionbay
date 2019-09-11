@@ -1,3 +1,4 @@
+
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import TokenService from './services/token.service'
@@ -16,7 +17,10 @@ const router = new VueRouter({
   routes: [
     { 
       path: '/',
-      component: Home
+      component: Home,
+      meta: {
+        public: true,
+      }
     },
     {
       path: '/login',
@@ -36,12 +40,18 @@ const router = new VueRouter({
     },
     {
       path: '/auctions',
-      component: AuctionsList
+      component: AuctionsList,
+      meta: {
+        public: true,
+      }
     },
     {
       path: '/auctions/:id',
       component: AuctionPage,
-      props: true
+      props: true,
+      meta: {
+        public: true,
+      }
     },
     {
       path: '/users',

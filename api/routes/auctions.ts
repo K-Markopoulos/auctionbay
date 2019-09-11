@@ -76,7 +76,6 @@ const placeBid = {
 
 // Get all auctions
 router.route('/').get(
-  authenticate,
   validate(getAll),
   prepare(method.getAllAuctions),
   respond
@@ -92,7 +91,7 @@ router.route('/').post(
   respond
 );
 
-// Create new auction
+// Export auctions
 router.route('/export').get(
   authenticate,
   guard.asAdmin(),
@@ -102,7 +101,6 @@ router.route('/export').get(
 
 // Get auction by id
 router.route('/:id').get(
-  authenticate,
   validate(getAuction),
   prepare(method.getAuction),
   respond

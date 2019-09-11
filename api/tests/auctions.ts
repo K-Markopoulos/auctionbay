@@ -78,12 +78,6 @@ describe('Test auctions routes', function() {
 
       p.should.have.status(404);
     });
-
-    it('should not get an auction by unknown user', async () => {
-      const p = await get(server, `/api/auctions/${auction._id}`);
-
-      p.should.have.status(401);
-    });
   });
 
   describe('GET @ /', function() {

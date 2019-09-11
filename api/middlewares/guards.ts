@@ -64,9 +64,25 @@ const asAdmin = () => {
   };
 };
 
+const asSelfOrAdmin = () => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const user = await User.findById(res.locals.accessor._id);
+    if (!user) {
+      console.warn('The accessor is not authenticated');
+      return next(new errors.UnauthorizedError());
+    }
+    if (user.role !== Enums.Role.ADMINISTRATOR && !res.locals.accessor._id.equals(req.params.id)) {
+      console.warn('The accessor is not authorized');
+      return next(new errors.ForbiddenError());
+    }
+    next();
+  };
+};
+
 export = {
   asRole,
   asSelf,
   asOwner,
-  asAdmin
+  asAdmin,
+  asSelfOrAdmin
 }

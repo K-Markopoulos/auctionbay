@@ -100,6 +100,7 @@ const deleteUserSchema = {
 // Get all users
 router.route('/').get(
   authenticate,
+  guard.asAdmin(),
   validate(getAllSchema),
   prepare(method.getAllUsers),
   respond
@@ -145,6 +146,7 @@ router.route('/approve').post(
 // Get user by id
 router.route('/:id').get(
   authenticate,
+  guard.asSelfOrAdmin(),
   validate(getUserSchema),
   prepare(method.getUser),
   respond
