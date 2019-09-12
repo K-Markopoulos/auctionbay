@@ -13,7 +13,8 @@
           <v-expansion-panel-header>{{folder.name}}</v-expansion-panel-header>
           <v-expansion-panel-content>
              <v-list two-line width="100%">
-              <v-list-item v-for="message in folder.messages" :key="message._id" @click="activeMessage = message" class="message-item">
+              <v-list-item v-for="message in folder.messages" :key="message._id" @click="select(message)"
+                :class="['message-item', isReceived(message) && !message.read ? 'messages-unread': '']">
                 <v-list-item-avatar>
                   <v-icon v-if="message.type === 'NOTIFICATION'">mdi-information-outline</v-icon>
                   <v-img v-if="message.type === 'MESSAGE'" :src="getUserAvatarByField(message, folder.field)"></v-img>
@@ -53,6 +54,8 @@
 <script>
 import ApiService from '../services/api.service';
 import store from '../services/store.service';
+import WS from '../services/websocker.service';
+
   export default {
     name: 'MessagesPage',
     data () {
@@ -127,6 +130,15 @@ import store from '../services/store.service';
 
       isSent(message) {
         return message.to.id !== this.user.id
+      },
+
+      select(message) {
+        if (!message.read) {
+          message.read = true;
+          store.commit('decreaseNotificationCount');
+          WS.send({ read: message._id });
+        }
+        this.activeMessage = message;
       }
     }
   }
@@ -140,7 +152,7 @@ import store from '../services/store.service';
 }
 .v-expansion-panel-content__wrap {
   width: 300px;
-  padding-left: 0 !important;
+  padding: 0 !important;
 }
 .message-title {
   text-align: start;
@@ -148,6 +160,11 @@ import store from '../services/store.service';
 
 .message-subtitle{
   text-align: start;
+}
+
+.messages-unread {
+  font-weight: 800;
+  background: beige;
 }
 
 .message-time{

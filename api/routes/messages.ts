@@ -40,6 +40,13 @@ router.route('/').get(
   respond
 );
 
+// Get messages count
+router.route('/count').get(
+  authenticate,
+  prepare(method.getNotificationCount),
+  respond
+);
+
 // Create message
 router.route('/').post(
   authenticate,

@@ -166,7 +166,7 @@ import store from '../services/store.service';
           this.avatarPreview = null;
           this.editMode = false;
           this.user = res.data;
-          store.commit('set', res.data);
+          store.commit('setUser', res.data);
         }).catch(err => {
           console.log(err);
         });

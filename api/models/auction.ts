@@ -45,6 +45,8 @@ export interface IAuction extends mongoose.Document{
   started: Date,
   ends: Date,
   seller: IUser | mongoose.Types.ObjectId,
+  buyer: IUser | mongoose.Types.ObjectId,
+  lastBidder: IUser | mongoose.Types.ObjectId,
   description: String,
   images?: IFile[]
 }
@@ -112,6 +114,20 @@ const AuctionSchema = new mongoose.Schema<IAuction>({
     required: true
   },
 
+  // The user who bought the auction (via BuyPrice)
+  buyer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+
+  // The user who bidded highest and won the auction
+  lastBidder: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+
   // The item's description
   description: {
     type: String,
@@ -137,6 +153,8 @@ AuctionSchema.methods.toJSON = function() {
     started: this.started,
     ends: this.ends,
     seller: this.seller,
+    buyer: this.buyer,
+    lastBidder: this.lastBidder,
     description: this.description,
     images: this.images || []
   };

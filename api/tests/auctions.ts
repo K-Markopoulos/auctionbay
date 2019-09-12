@@ -194,7 +194,8 @@ describe('Test auctions routes', function() {
   describe('POST @ /:id/bid', function() {
     let auction, bids;
     this.beforeEach(async () => {
-      bids = [...Array(10)].map(() => helpers.createBid({ bidder: bidder }));
+      let amount = 100;
+      bids = [...Array(10)].map((x,i) => helpers.createBid({ bidder: bidder, amount:  amount - i}));
       auction = await helpers.createAuction({ seller: seller, bids: bids });
     });
 
@@ -253,7 +254,7 @@ describe('Test auctions routes', function() {
       const p = await post(server, `/api/auctions/${auction._id}/bid`, bid, bidderToken);
 
       p.should.have.status(400);
-      p.body.error.should.equals('AUCTION_ENDED');
+      p.body.error.should.equals('AUCTION_CLOSED');
     });
   });
 });

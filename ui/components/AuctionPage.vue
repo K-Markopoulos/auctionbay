@@ -108,7 +108,7 @@
                 <v-btn class="primary" @click="openBidDialog">Place your bid</v-btn>
               </v-row>
             </v-card-text>
-            <v-card-text v-if="auction.buyPrice">
+            <v-card-text v-if="isActive && !!auction.buyPrice">
               <div class="title text--primary">Buy it for: {{auction.buyPrice}}$</div>
               <v-btn v-if="isRegistered"  class="primary" @click="buyConfirmDialog = true">Buy it now</v-btn>
             </v-card-text>
@@ -281,10 +281,10 @@
         return !!this.user;
       },
       isActive: function() {
-        return moment(this.auction.ends) > moment();
+        return moment(this.auction.ends) > moment() && !this.auction.buyer && !this.auction.lastBidder;
       },
       readonly: function() {
-        return this.auction && this.auction.bids && this.auction.bids.length > 0;
+        return this.auction && this.auction.bids && this.auction.bids.length > 0 || !this.isActive;
       },
       getEndDate: function() {
         return this.isActive

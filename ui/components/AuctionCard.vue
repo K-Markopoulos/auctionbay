@@ -68,8 +68,12 @@
           : '/assets/no-photo-available.png';
       },
 
+      isActive: function() {
+        return moment(this.auction.ends) > moment() && !this.auction.buyer && !this.auction.lastBidder;
+      },
+
       getStatus: function() {
-        if (moment(this.auction.ends) > moment()) {
+        if (this.isActive) {
           return 'Ends ' + moment(this.auction.ends).fromNow()
         }
         return 'Closed'

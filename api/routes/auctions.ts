@@ -71,8 +71,17 @@ const deleteAuction = {
 };
 
 const placeBid = {
+  params: {
+    id: validator.objectId().required()
+  },
   body: {
     amount: validator.number().required()
+  }
+};
+
+const buyItem = {
+  params: {
+    id: validator.objectId().required()
   }
 };
 
@@ -141,4 +150,12 @@ router.route('/:id/bid').post(
   respond
 );
 
+// Buy the item
+router.route('/:id/buy').post(
+  authenticate,
+  guard.asRole([enums.Role.REGISTERED, enums.Role.ADMINISTRATOR]),
+  validate(buyItem),
+  prepare(method.buyItem),
+  respond
+);
 export = router;

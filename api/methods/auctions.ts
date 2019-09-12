@@ -2,8 +2,11 @@ import fs = require('fs');
 import xml = require('xmlbuilder');
 import User, { IUser, SellerSummary }from '../models/user';
 import Auction, { IAuction, IBid }from '../models/auction';
+import Message = require('./messages');
 import errors = require('../common/errors');
 import Files = require('../common/files');
+import enums = require('../models/enums');
+import mongoose = require('mongoose');
 
 const _validateBid = (input: any, auction: IAuction) => {
   const bid = {
@@ -12,15 +15,14 @@ const _validateBid = (input: any, auction: IAuction) => {
     amount: input.amount
   };
 
-  // check if auction has ended
-  if (bid.time >= auction.ends) {
+  // check if auction has ended or has been bought
+  if (bid.time >= auction.ends || auction.buyer || auction.lastBidder) {
     console.info('Bids not accepted. Time over.');
-    throw new errors.BadRequestError('AUCTION_ENDED');
+    throw new errors.BadRequestError('AUCTION_CLOSED');
   }
 
   // check if it's not the highest bid
-  // TODO: check only the first, as we insert them in order
-  const isHighest = (auction.bids as IBid[]).every((otherBid: IBid) => bid.amount > otherBid.amount);
+  const isHighest = bid.amount > (auction.bids.length > 0 && auction.bids[0].amount);
   if (!isHighest) {
     console.info('Bid submitted is not the highest.');
     throw new errors.BadRequestError('LOW_AMOUNT');
@@ -28,6 +30,15 @@ const _validateBid = (input: any, auction: IAuction) => {
 
   return bid;
 };
+
+const _validatePurchase = (auction: IAuction) => {
+  if (!auction) {
+    throw new errors.NotFoundError();
+  }
+  if (auction.buyer || auction.lastBidder || auction.ends < new Date()) {
+    throw new errors.BadRequestError('AUCTION_CLOSED');
+  }
+}
 
 const _validateAuctionUpdate = async (input) => {
   const auction = await Auction.findById(input.id);
@@ -48,6 +59,9 @@ const _getQueryFilters = (input: any) => {
   }
   if (input.active) {
     filters['ends'] = { $gt: new Date().toUTCString() }
+  }
+  if (input.seller && mongoose.Types.ObjectId.isValid(input.seller)) {
+    filters['seller'] = input.seller
   }
   return filters;
 };
@@ -199,6 +213,23 @@ const placeBid = async (input) => {
   return (await auction.save()).toJSON();
 };
 
+const buyItem = async (input) => {
+  return Auction.findById(input.id).populate('seller', SellerSummary).then(auction => {
+    _validatePurchase(auction);
+    auction.buyer = input.accessor._id;
+    return auction.save();
+  }).then(auction => {
+    Message.sendNotification({
+      body: `Your item "${auction.name}" has been bought by user ${input.accessor.username}`,
+      to: (auction.seller as any)._id
+    });
+    return auction.toJSON();
+  }).catch(err => {
+    console.info('Failed to buy item', err);
+    throw new errors.BadRequestError(err.message);
+  })
+};
+
 export = {
   createAuction,
   exportAuctions,
@@ -206,5 +237,6 @@ export = {
   getAllAuctions,
   updateAuction,
   deleteAuction,
-  placeBid
+  placeBid,
+  buyItem
 }

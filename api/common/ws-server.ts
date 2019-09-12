@@ -2,6 +2,7 @@
 import WebSocketServer = require('websocket');
 import tokens = require('./tokens');
 import User, { IUser } from '../models/user';
+import Message, { IMessage } from '../models/message';
 import https = require('https');
 
 let wsServer: WebSocketServer.server;
@@ -40,7 +41,11 @@ const handleMessage = (connection: WebSocketServer.connection) =>  {
       return;
     }
     if (data.token) {
-      verifyUser(data.token, connection);
+      return verifyUser(data.token, connection);
+    }
+    if (data.read) {
+      return Message.findByIdAndUpdate(data.read, { read: true }, { new: true })
+        .then(message => message);
     }
   };
 };
@@ -64,17 +69,10 @@ const verifyUser = (token: string, connection: WebSocketServer.connection) => {
       return connection.send(unauthorizedError);
     }
 
-    console.info('WS user verified. Storing connection');
+    console.info('WS user verified. Storing connection', user._id.toString());
     // Store the connection
-    clients.set(user._id, connection);
+    clients.set(user._id.toString(), connection);
   })
-};
-
-const storeConnection = (connection: WebSocketServer.connection, userID: string)=> {
-  clients.set(userID, connection);
-};
-
-const closeConnection = (closeReason, description) =>  {
 };
 
 const start = () => {
@@ -85,13 +83,13 @@ const start = () => {
       console.info('WS Connection accepted.');
 
       connection.on('message', handleMessage(connection));
-      // connection.on('close', closeConnection);
   });
 };
 
 const notifyUser = (userID: string, notification: Object) => {
-  if (clients[userID]) {
-    clients[userID].sendUTF(JSON.stringify(notification));
+  const connection = clients.get(userID);
+  if (connection) {
+    connection.sendUTF(JSON.stringify(notification));
   }
 };
 

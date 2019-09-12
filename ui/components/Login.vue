@@ -73,13 +73,17 @@
       },
 
       onSuccess: function(res) {
-        store.commit('set', res.data);
+        store.commit('setUser', res.data);
         TokenService.saveToken(res.data.token);
         TokenService.saveUserID(res.data.id);
         ApiService.setHeader();
         console.log('Logged in');
-
-        this.$router.push(this.$router.history.current.query.redirect || '/');
+        
+        // get notifications count
+        ApiService.get('messages/count').then(res => {
+          store.commit('setUnreadCount', res.data.unread);
+          this.$router.push(this.$router.history.current.query.redirect || '/');
+        });
       },
 
       onError: function(res) {

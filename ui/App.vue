@@ -16,11 +16,20 @@
       </v-avatar>
       <v-menu bottom offset-y>
         <template v-slot:activator="{ on }">
-          <v-icon v-on="on">mdi-menu-down</v-icon>
+          <div class="d-flex" v-on="on">
+            <v-icon v-if="!!notificationCount" class="notification-circle">mdi-circle-outline</v-icon>
+            <v-icon>mdi-menu-down</v-icon>
+          </div>
         </template>
         <v-list>
         <v-list-item :to="getUserProfileLink">Profile</v-list-item>
-        <v-list-item :to="getUserMessagesLink">Messages</v-list-item>
+        <v-list-item :to="getUserMessagesLink">
+          Messages
+          <div v-if="!!notificationCount" class="d-flex">
+            <span class="px-2">·</span>
+            <span v-text="notifIcon" class="notification-count"></span>
+          </div>
+        </v-list-item>
         <v-divider></v-divider>
         <v-list-item @click="logout">Logout</v-list-item>
         </v-list>
@@ -50,6 +59,7 @@
 import TokenService from './services/token.service';
 import CreateAuctionFrom from './components/CreateAuctionForm';
 import store from './services/store.service';
+import WS from './services/websocker.service';
 
 export default {
   name: 'app',
@@ -83,6 +93,13 @@ export default {
 
     isAdmin() {
       return this.user.role === 'ADMINISTRATOR';
+    },
+
+    notificationCount() {
+      return store.state.unread;
+    },
+    notifIcon() {
+      return this.notificationCount >= 10 && '10+' || this.notificationCount || ''
     }
   },
 
@@ -94,18 +111,19 @@ export default {
     logout() {
       TokenService.removeToken();
       TokenService.removeUserID();
+      WS.disconnect();
       this.$router.push('/login');
     },
 
     closeDialog() {
       this.openNewAuctionForm = false;
-    }
+    },
   }
 }
 </script>
 
 <style>
-#app {
+#app, #toast-container {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -134,5 +152,16 @@ a {
 #user-avatar {
   align-self: center;
   margin: 0px 10px;
+}
+
+.notification-circle {
+  position: absolute;
+  bottom: 20px;
+  color: red !important;
+}
+
+.notification-count {
+  color: red;
+  font-weight: 600;
 }
 </style>

@@ -1,33 +1,43 @@
 import TokenService from './token.service';
+import Vue from 'vue';
 
-let ws;
-
-const WS = {
-  connect() {
-    ws = new WebSocket('wss://localhost:8888');
-
-    ws.onopen = (connection) => {
-      const data = {
-        token: TokenService.getToken()
-      };
-      ws.send(JSON.stringify(data));
-    };
-
-    ws.onmessage = (message) => {
-      let notification = {};
-      try {
-        notification = JSON.parse(message);
-      } catch {
-        console.error('Failed to parse WS notification');
-      }
-      this.$emit('NOTIFICATION', notification);
-    };
+const WS = new Vue({
+  data: {
+    ws: null
   },
 
-  send(message) {
-    const data = JSON.stringify(message);
-    ws.send(data);
+  methods: {
+    connect() {
+      this.ws = new WebSocket('wss://localhost:8888');
+
+      this.ws.onopen = (connection) => {
+        const data = {
+          token: TokenService.getToken()
+        };
+        this.ws.send(JSON.stringify(data));
+      };
+
+      this.ws.onmessage = (message) => {
+        let notification = {};
+        try {
+          notification = JSON.parse(message.data);
+        } catch {
+          console.error('WS Failed to parse incoming notification');
+        }
+        console.log('Notification received:', message);
+        this.$emit('NOTIFICATION', notification);
+      };
+    },
+
+    send(message) {
+      const data = JSON.stringify(message);
+      this.ws.send(data);
+    },
+
+    disconnect() {
+      this.ws.close();
+    }
   }
-};
+});
 
 export default WS;
