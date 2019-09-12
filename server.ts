@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
-
 import app = require('./app');
+import ws = require('./api/common/ws-server');
 import https = require('https');
 import fs = require('fs');
 
@@ -31,14 +31,18 @@ const server_port:number = Number(process.env.PORT);
 // don't run server on tests
 if (!module.parent) {
   // start the server on https
-  https.createServer({
+  const server = https.createServer({
     key: fs.readFileSync(process.env.SSL_KEY_FILE),
     cert: fs.readFileSync(process.env.SSL_CERT_FILE),
     passphrase: process.env.SSL_PASSPHRASE
-  }, app)
-  .listen(server_port, process.env.HOST, () => {
+  }, app);
+  server.listen(server_port, process.env.HOST, () => {
     console.info(`Server started in ${process.env.NODE_ENV} mode on port ${process.env.PORT}.`);
   });
+
+  // Start WebSocket server
+  ws.mount(server);
+  ws.start();
 }
 
 export = app;

@@ -5,6 +5,7 @@ import vuetify from './plugins/vuetify'
 import ApiService from './services/api.service'
 import TokenService from './services/token.service'
 import store from './services/store.service'
+import WS from './services/websocker.service'
 
 Vue.prototype.$defaultAvatar = '/assets/user-avatar.png';
 
@@ -49,6 +50,7 @@ if (TokenService.getToken()) {
   ApiService.setHeader();
   ApiService.get(`/users/${TokenService.getUserID()}`).then(res => {
     store.commit('set', res.data);
+    WS.connect();
     
     new Vue({
       store,
