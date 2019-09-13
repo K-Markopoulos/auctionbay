@@ -89,6 +89,7 @@ const start = () => {
 const notifyUser = (userID: string, notification: Object) => {
   const connection = clients.get(userID);
   if (connection) {
+    console.info('Notifying user:', userID);
     connection.sendUTF(JSON.stringify(notification));
   }
 };

@@ -1,7 +1,7 @@
 <template>
   <v-card
   width="1200"
-  height="100%"
+  min-height="600px"
   >
     <v-toolbar flat color="primary" dark>
       <v-toolbar-title>Messages</v-toolbar-title>
@@ -11,8 +11,8 @@
       <v-expansion-panels v-model="panel" accordion focusable width="300" class="message-panels">
         <v-expansion-panel v-for="folder in folders" :key="folder.name">
           <v-expansion-panel-header>{{folder.name}}</v-expansion-panel-header>
-          <v-expansion-panel-content>
-             <v-list two-line width="100%">
+          <v-expansion-panel-content >
+             <v-list two-line width="100%" class="message-list">
               <v-list-item v-for="message in folder.messages" :key="message._id" @click="select(message)"
                 :class="['message-item', isReceived(message) && !message.read ? 'messages-unread': '']">
                 <v-list-item-avatar>
@@ -34,30 +34,39 @@
 
       <v-card flat width="100%" v-if="activeMessage">
         <v-card-title height="200">
-          <div v-if="activeMessage.type === 'MESSAGE'">
-            <v-avatar class="mr-2" size="30" color="grey">
+          <div v-if="activeMessage.type === 'MESSAGE'" class="active-message-header">
+            <v-avatar class="mr-2 float-left" size="30" color="grey">
               <v-img size="30" :src="getUserAvatar(activeMessage)"></v-img>
             </v-avatar>
-            <span>{{getUserName(activeMessage)}}</span>
+            <span class="float-left">{{getUserName(activeMessage)}}</span>
+            <v-btn class="float-right" text color="primary" @click="showReplyBox"><v-icon>mdi-reply</v-icon></v-btn>
           </div>
-          <span v-if="activeMessage.type === 'NOTIFICATION'">System Notification</span>
+          <span v-else>System Notification</span>
         </v-card-title>
           <v-divider></v-divider>
         <v-card-text>
           <span >{{activeMessage.body}}</span>
         </v-card-text>
+
+        <div class="reply-box">
+          <message-box v-if="showMessageBox" v-bind="messageProps"></message-box>
+        </div>
       </v-card>
     </v-layout>
   </v-card>
 </template>
 
 <script>
+import MessageBox from './MessageBox';
 import ApiService from '../services/api.service';
 import store from '../services/store.service';
 import WS from '../services/websocker.service';
 
   export default {
     name: 'MessagesPage',
+    components: {
+      'message-box': MessageBox
+    },
     data () {
       return {
         messages: [],
@@ -74,7 +83,9 @@ import WS from '../services/websocker.service';
           },
         ],
         panel: 0,
-        activeMessage: null
+        activeMessage: null,
+        showMessageBox: false,
+        messageProps: {}
       }
     },
     created() {
@@ -138,8 +149,20 @@ import WS from '../services/websocker.service';
           store.commit('decreaseNotificationCount');
           WS.send({ read: message._id });
         }
+        this.showMessageBox = false;
         this.activeMessage = message;
-      }
+      },
+
+      showReplyBox() {
+        this.messageProps = {
+          dialog: false,
+          to: this.activeMessage.from,
+          auctionId: this.activeMessage.auctionId,
+          onCancel: () => this.showMessageBox = false,
+          onSubmit: () => this.showMessageBox = false,
+        },
+        this.showMessageBox = true;
+      },
     }
   }
 </script>
@@ -176,5 +199,20 @@ import WS from '../services/websocker.service';
   border-bottom-width: 1px;
   border-bottom-style: solid;
   border-image: linear-gradient(to right,grey, white) 1;
+}
+
+.message-list {
+  max-height: 600px;
+  overflow: auto;
+}
+
+.active-message-header {
+  width: 100%;
+}
+
+.reply-box {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
 </style>

@@ -5,7 +5,8 @@ import WS = require("../common/ws-server");
 
 const create = async (details: any) => {
   const message = new Message(details);
-  return message.save();
+  await message.save();
+  return Message.populate(message, { path: 'from', select: '_id username', model: 'User'});
 };
 
 const send = async (message: IMessage) => {
@@ -15,7 +16,8 @@ const send = async (message: IMessage) => {
     }
   });
   if (message.from) {
-    await User.findByIdAndUpdate(message.from, {
+    const from = (message.from as IUser)._id;
+    await User.findByIdAndUpdate(from, {
       $push: {
         messages: message._id
       }

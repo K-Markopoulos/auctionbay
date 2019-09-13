@@ -1,4 +1,5 @@
 import TokenService from './token.service';
+import EventBus from './eventbus.service';
 import Vue from 'vue';
 
 const WS = new Vue({
@@ -25,7 +26,7 @@ const WS = new Vue({
           console.error('WS Failed to parse incoming notification');
         }
         console.log('Notification received:', message);
-        this.$emit('NOTIFICATION', notification);
+        EventBus.$emit('NOTIFICATION', notification);
       };
     },
 

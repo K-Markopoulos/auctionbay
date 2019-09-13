@@ -60,6 +60,7 @@ import TokenService from './services/token.service';
 import CreateAuctionFrom from './components/CreateAuctionForm';
 import store from './services/store.service';
 import WS from './services/websocker.service';
+import EventBus from './services/eventbus.service';
 
 export default {
   name: 'app',
@@ -71,6 +72,10 @@ export default {
     return {
       openNewAuctionForm: false
     }
+  },
+
+  mounted() {
+    this.registerListeners();
   },
 
   computed: {
@@ -118,6 +123,19 @@ export default {
     closeDialog() {
       this.openNewAuctionForm = false;
     },
+
+    registerListeners() {
+      EventBus.$on('NOTIFICATION', this.handleNotification);
+    },
+
+    handleNotification(message) {
+      if (message.type === 'NOTIFICATION') {
+        toastr.info(message.body);
+      } else {
+        console.log(message);
+        toastr.info(message.body, `From: ${message.from.username}`);
+      }
+    }
   }
 }
 </script>

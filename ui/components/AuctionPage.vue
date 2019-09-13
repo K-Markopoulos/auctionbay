@@ -1,19 +1,37 @@
 <template>
   <div style="height: 100%; width: 100%;" v-if="!loading">
-    <v-btn
-      v-if="isOwner"
-      @click="deleteConfirmDialog = true"
-      :disabled="readonly"
-      text outlined color="error" class="action-button" 
-    >Delete Auction</v-btn>
-    <v-btn 
-      v-if="isOwner"
-      @click="editDialog = true"
-      :disabled="readonly"
-      text outlined color="primary" class="action-button"
-    >Edit Auction</v-btn>
-    <span v-if="isOwner && readonly" class="action-helper action-button">Cannot edit or delete this auction, anymore. There are placed bids.</span>
+    <div class="d-flex justify-end" v-if="isOwner && !isBought">
+      <span v-if="readonly" class="action-helper action-button">Cannot edit or delete this auction, anymore.</span>
+      <v-btn 
+        @click="editDialog = true"
+        :disabled="readonly"
+        text outlined color="primary" class="action-button"
+      >Edit Auction</v-btn>
+      <v-btn
+        @click="deleteConfirmDialog = true"
+        :disabled="readonly"
+        text outlined color="error" class="action-button" 
+      >Delete Auction</v-btn>
+    </div>
 
+    <div class="d-flex justify-center" v-if="isOwner && isBought">
+      <span class="action-helper action-button">This item has been bought!</span>
+      <v-btn 
+        @click="contactBuyer"
+        text outlined color="primary" class="action-button"
+      >Contact buyer</v-btn>
+    </div>
+
+    <div class="d-flex justify-center" v-if="isWinner">
+      <span class="action-helper action-button">You have won this auction!</span>
+      <v-btn 
+        @click="contactSeller"
+        text outlined color="primary" class="action-button"
+      >Contact seller</v-btn>
+    </div>
+
+    <message-box v-if="showMessageBox" v-bind="messageProps"></message-box>
+    
     <v-container fluid fill-height v-if="auction">
       <v-row style="align-self: flex-start;">
         <v-col cols="8">
@@ -211,6 +229,7 @@
           :on-submit="refresh"
         ></update-auction-form>
       </v-dialog>
+
       <v-dialog v-model="deleteConfirmDialog" width="500">
         <v-card>
           <v-card-title primary-title class="headline grey lighten-3">
@@ -243,12 +262,14 @@
   import LocationService from '../services/location.service';
   import store from '../services/store.service';
   import UpdateAuctionForm from './UpdateAuctionForm';
+  import MessageBox from './MessageBox';
 
   export default {
     name: 'AuctionPage',
     props: ['id'],
     components: {
-      'update-auction-form': UpdateAuctionForm
+      'update-auction-form': UpdateAuctionForm,
+      'message-box': MessageBox
     },
     created() {
       this.getAuction();
@@ -261,27 +282,35 @@
         buyConfirmDialog: false,
         deleteConfirmDialog: false,
         editDialog: false,
+        showMessageBox: false,
+        messageProps: {},
         bidValue: '',
         bidValueRules: [
           v => !v || v > this.auction.current || "Value must be higher than " + this.auction.current + "$ (Current highest)"
         ],
         imgIndex: 0,
-        noMap: false
+        noMap: false,
       }
     },
 
     computed: {
       user() {
-        return store.state.user;
+        return store.state.user || {};
       },
       isOwner() {
         return this.auction && this.auction.seller && this.user && this.user.id === this.auction.seller.id
       },
+      isWinner() {
+        return this.user.id === this.auction.lastBidder || this.user.id === this.auction.buyer;
+      },
       isRegistered() {
         return !!this.user;
       },
+      isBought() {
+        return this.auction.buyer || this.auction.lastBidder;
+      },
       isActive: function() {
-        return moment(this.auction.ends) > moment() && !this.auction.buyer && !this.auction.lastBidder;
+        return moment(this.auction.ends) > moment() && !this.isBought;
       },
       readonly: function() {
         return this.auction && this.auction.bids && this.auction.bids.length > 0 || !this.isActive;
@@ -335,6 +364,28 @@
         if (this.bidValue > this.auction.current) {
           this.bidConfirmDialog = true;
         }
+      },
+
+      contactSeller: function() {
+        this.messageProps = {
+          dialog: true,
+          to: this.auction.seller,
+          auctionId: this.auction.id,
+          onCancel: () => this.showMessageBox = false,
+          onSubmit: () => this.showMessageBox = false,
+        },
+        this.showMessageBox = true;
+      },
+
+      contactBuyer: function() {
+        this.messageProps = {
+          dialog: true,
+          to: this.auction.buyer || this.auction.lastBidder,
+          auctionId: this.auction.id,
+          onCancel: () => this.showMessageBox = false,
+          onSubmit: () => this.showMessageBox = false,
+        },
+        this.showMessageBox = true;
       },
 
       submitBid: function() {
