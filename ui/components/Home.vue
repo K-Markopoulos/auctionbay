@@ -17,7 +17,8 @@
 <script>
   import AuctionsSlider from './AuctionsSlider.vue'
   import ApiService from '../services/api.service'
-
+  import store from '../services/store.service';
+  
   export default {
     name: 'Home',
     components: {
@@ -28,12 +29,20 @@
       return {
         banner: '/assets/banner.jpg',
         auctionsCount: '',
-        categoriesCount: this.$categories.length
       }
     },
 
     created() {
       this.getAuctionNumber()
+    },
+
+    computed: {
+      categories() {
+        return store.state.categories;
+      },
+      categoriesCount() {
+        return this.categories.length;
+      }
     },
 
     methods: {

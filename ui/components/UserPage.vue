@@ -129,6 +129,9 @@ import store from '../services/store.service';
       this.getUser();
     },
     computed: {
+      currentUser() {
+        return store.state.user;
+      },
       getFullname() {
         return `${this.user.firstName} ${this.user.lastName}`;
       },
@@ -138,7 +141,7 @@ import store from '../services/store.service';
           || this.$defaultAvatar
       },
       isSameUser() {
-        return this.user.id === this.user.id;
+        return this.user.id === (this.currentUser && this.currentUser.id);
       }
     },
     methods: {

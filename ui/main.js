@@ -9,41 +9,13 @@ import WS from './services/websocker.service'
 
 Vue.prototype.$defaultAvatar = '/assets/user-avatar.png';
 
-Vue.prototype.$categories = [
-  "Antiques",
-  "Art",
-  "Books",
-  "CDs, DVDs, Games",
-  "Clothing",
-  "Collectibles",
-  "Computers",
-  "Dining",
-  "Electronics",
-  "Food & Gourmet Items",
-  "For Your Pet",
-  "Golf & Sports Gear",
-  "Handbags",
-  "Health & Fitness",
-  "Home",
-  "Jewelry",
-  "Lawn & Garden",
-  "Memorabilia",
-  "Other",
-  "Services",
-  "Spa & Beauty",
-  "Tickets-Entertainment",
-  "Tickets-Sports",
-  "Toys",
-  "Travel",
-  "Unique Experiences",
-  "Wine",
-];
-
-Vue.prototype.$defaultAvatar = '/assets/user-avatar.png';
-Vue.prototype.$user = {};
-
 // Set the base URL of the API
 ApiService.init('https://localhost:8888/api');
+
+// Fetch available categories for auctions
+ApiService.get('/auctions/categories').then(res => {
+  store.commit('setCategories', res.data);
+});
 
 // If token exists set header
 if (TokenService.getToken()) {

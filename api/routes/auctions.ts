@@ -27,7 +27,7 @@ const getAll = {
 const createAuction = {
   body: {
     name: validator.string().required(),
-    category: validator.array().items(validator.string()).required(),
+    category: validator.array().items(validator.string().valid(...enums.Categories)).required(),
     buyPrice: validator.number().optional().allow(''),
     firstBid: validator.number().required(),
     location: validator.object({
@@ -51,7 +51,7 @@ const getAuction = {
 const updateAuction = {
   body: {
     name: validator.string().optional(),
-    category: validator.array().items(validator.string()).optional(),
+    category: validator.array().items(validator.string().valid(...enums.Categories)).optional(),
     location: validator.object({
       address: validator.string().required(),
       country: validator.string().required(),
@@ -104,6 +104,12 @@ router.route('/').post(
   upload.parseImages('auction'),
   validate(createAuction),
   prepare(method.createAuction),
+  respond
+);
+
+// Get available categories for auctions
+router.route('/categories').get(
+  prepare(method.getCategories),
   respond
 );
 

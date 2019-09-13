@@ -1,3 +1,6 @@
+import TokenService from './token.service';
+import router from '../router'
+
 toastr.options = {
   "closeButton": true,
   "debug": false,
@@ -49,7 +52,7 @@ const Errors = {
   },
 
   showError(error_code) {
-    toastr.error(tr[error_code]|| '');
+    toastr.error(tr[error_code]|| 'Ops that didn\'t work');
   },
 };
 

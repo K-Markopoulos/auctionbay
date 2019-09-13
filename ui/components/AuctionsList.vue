@@ -18,7 +18,7 @@
         prepend-icon="category"
         hide-details
         single-line
-        :items="$categories"
+        :items="categories"
         @input="getAuctions"
         >
       </v-select>
@@ -57,6 +57,7 @@
 <script>
   import ApiService from '../services/api.service';
   import AuctionCard from './AuctionCard';
+  import store from '../services/store.service';
 
   export default {
     name: 'AuctionsList',
@@ -80,6 +81,12 @@
       this.getAuctions();
     },
     
+    computed: {
+      categories() {
+        return store.state.categories;
+      }
+    },
+
     methods: {
       getAuctions: function() {
         this.loading = true;

@@ -23,7 +23,7 @@
 
         <v-autocomplete
             v-model="auction.category"
-            :items="$categories"
+            :items="categories"
             chips
             deletable-chips
             label="Categories"
@@ -187,7 +187,8 @@
 <script>
   import ApiService from '../services/api.service';
   import TokenService from '../services/token.service';
-
+  import store from '../services/store.service';
+  
   export default {
     name: 'CreateAuctionForm',
     props: [
@@ -216,6 +217,9 @@
       },
       nowTime: function() {
         return this.today === this.endsDate ? moment().format('h:mm') : '';
+      },
+      categories() {
+        return store.state.categories;
       }
     },
 

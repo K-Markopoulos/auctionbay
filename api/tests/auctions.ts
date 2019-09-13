@@ -9,7 +9,7 @@ import users = require('../methods/users');
 
 const auctionData = {
   name: faker.commerce.productName(),
-  category: [faker.commerce.product()],
+  category: [enums.Categories[1]],
   buyPrice: 1000,
   firstBid: 10,
   location: helpers.createLocation(),
@@ -160,7 +160,8 @@ describe('Test auctions routes', function() {
   describe('PUT @ /:id', function() {
     let auction, bid;
     const changes = {
-      description: faker.lorem.sentence()
+      description: faker.lorem.sentence(),
+      category: ['Antiques']
     }
     this.beforeEach(async () => {
       bid = helpers.createBid({ bidder: bidder });
@@ -173,6 +174,16 @@ describe('Test auctions routes', function() {
       p.should.have.status(200);
       p.body.should.have.property('name').equals(auction.name);
       p.body.should.have.property('description').equals(changes.description);
+    });
+
+    it('should not update an auction with unknown category', async () => {
+      const d = {
+        ...changes,
+        category: ['Antiques', 'unknownCategory']
+      }
+      const p = await put(server, `/api/auctions/${auction._id}`, d, sellerToken);
+
+      p.should.have.status(400);
     });
 
     it('should not update an unknown auction', async () => {

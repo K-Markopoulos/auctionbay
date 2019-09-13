@@ -1,7 +1,6 @@
 import mongoose = require('mongoose');
 
 export interface IRating extends mongoose.Document {
-  0: number,
   1: number,
   2: number,
   3: number,
@@ -12,10 +11,6 @@ export interface IRating extends mongoose.Document {
 
 
 export const RatingSchema = new mongoose.Schema<IRating> ({
-  0: {
-    type: Number,
-    default: 0
-  },
   1: {
     type: Number,
     default: 0
@@ -43,8 +38,6 @@ export const RatingSchema = new mongoose.Schema<IRating> ({
 });
 
 export const DefaultRatingSchema: IRating = {
-  0: 0,
-  1: 0,
   2: 0,
   3: 0,
   4: 0,

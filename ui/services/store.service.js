@@ -6,7 +6,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     user: null,
-    unread: 0
+    unread: 0,
+    categories: []
   },
   mutations: {
     setUser (state, user) {
@@ -17,6 +18,9 @@ export default new Vuex.Store({
     },
     decreaseNotificationCount (state) {
       state.unread--;
+    },
+    setCategories (state, categories) {
+      state.categories = categories;
     }
   }
 })

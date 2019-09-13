@@ -155,6 +155,10 @@ const getAuction = async (input) => {
   return (await auction.save()).toJSON();
 };
 
+const getCategories = async (_input) => {
+  return Promise.resolve(enums.Categories);
+};
+
 const getAllAuctions = async (input) => {
   const filters = _getQueryFilters(input);
   const options = _getQueryOptions(input);
@@ -234,6 +238,7 @@ export = {
   createAuction,
   exportAuctions,
   getAuction,
+  getCategories,
   getAllAuctions,
   updateAuction,
   deleteAuction,

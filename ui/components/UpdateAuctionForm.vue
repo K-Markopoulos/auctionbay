@@ -23,7 +23,7 @@
 
         <v-autocomplete
           v-model="auction.category"
-          :items="$categories"
+          :items="categories"
           chips
           deletable-chips
           label="Categories"
@@ -119,6 +119,7 @@
 <script>
   import ApiService from '../services/api.service';
   import TokenService from '../services/token.service';
+  import store from '../services/store.service';
 
   export default {
     name: 'CreateAuctionForm',
@@ -143,7 +144,11 @@
     computed: {
       getImageSrc() {
         return (image) => `/uploads/${this.auction.id}/${image.fid}`;
-      }
+      },
+      
+      categories() {
+        return store.state.categories;
+      },
     },
 
     methods: {
