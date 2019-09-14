@@ -171,7 +171,13 @@ const getAllAuctions = async (input) => {
 };
 
 const exportAuctions = async (input) => {
-  const auctions = await Auction.find({});
+  const auctions = await Auction.find({}).populate({
+    path: 'seller bids',
+    populate: {
+      path: 'bids.bidder',
+      model: 'User'
+    }
+  });
   return _createXML(auctions);
 };
 

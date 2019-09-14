@@ -156,7 +156,9 @@ import WS from '../services/websocker.service';
       showReplyBox() {
         this.messageProps = {
           dialog: false,
-          to: this.activeMessage.from,
+          to: this.isReceived(this.activeMessage)
+            ? this.activeMessage.from
+            : this.activeMessage.to,
           auctionId: this.activeMessage.auctionId,
           onCancel: () => this.showMessageBox = false,
           onSubmit: () => this.showMessageBox = false,
@@ -214,5 +216,9 @@ import WS from '../services/websocker.service';
   position: absolute;
   bottom: 0;
   width: 100%;
+}
+
+.v-expansion-panel-header, .v-expansion-panel {
+  font-size: 20px;
 }
 </style>

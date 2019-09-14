@@ -13,6 +13,9 @@ export default new Vuex.Store({
     setUser (state, user) {
       state.user = user;
     },
+    logout (state) {
+      state.user = null;
+    },
     setUnreadCount (state, count) {
       state.unread = count;
     },
