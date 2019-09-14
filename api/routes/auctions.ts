@@ -7,6 +7,7 @@ import method = require('../methods/auctions');
 import prepare = require('../middlewares/prepare');
 import { validate } from '../middlewares/validate';
 import upload = require('../middlewares/multipart');
+import activity = require('../middlewares/activity');
 import enums = require('../models/enums');
 
 const router = express.Router();
@@ -124,6 +125,7 @@ router.route('/export').get(
 // Get auction by id
 router.route('/:id').get(
   validate(getAuction),
+  activity.track(enums.Activities.VISIT),
   prepare(method.getAuction),
   respond
 );
@@ -150,6 +152,7 @@ router.route('/:id').delete(
 // Place a bid
 router.route('/:id/bid').post(
   authenticate,
+  activity.track(enums.Activities.BID),
   guard.asRole([enums.Role.REGISTERED, enums.Role.ADMINISTRATOR]),
   validate(placeBid),
   prepare(method.placeBid),

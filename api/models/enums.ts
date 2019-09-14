@@ -15,6 +15,11 @@ const MessageType = {
   NOTIFICATION: 'NOTIFICATION'
 }
 
+const Activities = {
+  VISIT: 0,
+  BID: 1,
+}
+
 const Categories = [
   "Antiques",
   "Art",
@@ -48,6 +53,7 @@ const Categories = [
 export = {
   Role,
   Status,
+  Activities,
   MessageType,
   Categories
 }

@@ -19,7 +19,8 @@ const uriwa = `mongodb://${host}:${port}/${name}`;
 const uri = `mongodb://${auth}${host}:${port}/${name}`;
 mongoose.connect(uri, {
   keepAlive: true,
-  useNewUrlParser: true
+  useNewUrlParser: true,
+  useFindAndModify: false
 }).then(() => {
   console.info(`System connected to the database @ ${uriwa}.`);
 }).catch((error) => {
