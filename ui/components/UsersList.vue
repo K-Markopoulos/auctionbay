@@ -1,29 +1,27 @@
 <template>
-  <v-flex xs12 sm8 md6>
+  <v-flex class="align-self-start">
     <v-toolbar dark color="primary" >
       <v-toolbar-title>Users</v-toolbar-title>
+      <div class="flex-grow-1"></div>
+      <v-text-field
+        v-model="search"
+        append-icon="search"
+        label="Search"
+        single-line
+        hide-details
+        @input="debounceSearch"
+      ></v-text-field>
     </v-toolbar>
-    <v-progress-linear v-if="isLoading" indeterminate color="purple"></v-progress-linear>
-    <v-list width="auto">
-      <v-list-item dense v-for="user in users" :key="user.id">
-        <v-list-item-action>
-          <v-checkbox :disabled="isApproved(user)" v-model="user.selected"></v-checkbox>
-        </v-list-item-action>
-
-        <v-list-item-content >
-          <router-link :to="getLink(user)" tag="div" style="cursor: pointer">
-            <v-list-item-title v-text="user.username"></v-list-item-title>
-            <v-list-item-subtitle v-text="user.firstName + ' ' + user.lastName"></v-list-item-subtitle>
-            <v-list-item-subtitle v-text="userDetails(user)"></v-list-item-subtitle>
-          </router-link>
-        </v-list-item-content>
-        
-        <v-list-item-action>
-          <v-btn v-if="isApproved(user)" v-text="user.status" disabled text small></v-btn>
-          <v-btn v-if="isPending(user)" :loading="user.approving" @click="approveUser(user)" small color="primary">Approve</v-btn>
-        </v-list-item-action>
-      </v-list-item>
-    </v-list>
+    <v-data-table
+      :headers="headers"
+      :footer-props="footer"
+      :items="users"
+      :items-per-page="limit"
+      :options.sync="options"
+      :server-items-length="totalUsers"
+      :items-per-page-options="[20, 10, 30, 40]"
+      class="elevation-1"
+    ></v-data-table>
     <v-btn block :disabled="!anySelected" @click="approveUsers" color="primary">Approve selected</v-btn>
     <v-btn block @click="exportUsers" color="primary"><v-icon>mdi-download</v-icon>Export auctions</v-btn>
   </v-flex>
@@ -36,7 +34,34 @@ import ApiService from '../services/api.service';
     data () {
       return {
         users: [],
-        isLoading: true
+        isLoading: true,
+        headers: [
+          { text: 'Username', value: 'username' },
+          { text: 'Firstname', value: 'firstName' },
+          { text: 'Lastname', value: 'lastName' },
+          { text: 'Email', value: 'email' },
+          { text: 'Country', value: 'location.country' },
+          { text: 'Status', value: 'status' },
+        ],
+        footer: {
+          'items-per-page-options': [10, 20, 30, 40, 50]
+        },
+        options: {},
+        page: 1,
+        limit: 10,
+        totalUsers: 0,
+        sortBy: '',
+        status: '',
+        search: '',
+        debounce: null
+      }
+    },
+    watch: {
+      options: {
+        handler () {
+          this.getUsers();
+        },
+        deep: true,
       }
     },
     computed: {
@@ -57,14 +82,26 @@ import ApiService from '../services/api.service';
       }
     },
     mounted() {
-      ApiService.get('/users').then(this.onSuccess).catch(this.onError);
+      this.getUsers();
     },
     methods: {
+      getUsers: function() {
+        this.isLoading = true;
+        const { sortBy, sortDesc, page, itemsPerPage } = this.options;
+        const order = sortDesc[0] ? 'desc' : 'asc';
+        const query = 'page=' + (page-1) +
+          '&limit=' + itemsPerPage +
+          '&sortBy=' + sortBy +
+          '&order=' + order +
+          '&search=' + this.search +
+          '&status=' + this.status;
+        ApiService.get(`/users?${query}`).then(this.onSuccess).catch(this.onError);
+      },
+
       onSuccess: function(res) {
         this.isLoading = false;
-        this.users = res.data.map(user => {
-          return { ...user, approving: false }
-        });
+        this.users = res.data.data;
+        this.totalUsers = res.data.total;
       },
 
       onError: function(res) {
@@ -113,6 +150,15 @@ import ApiService from '../services/api.service';
           document.body.appendChild(link);
           link.click();
         });
+      },
+
+      debounceSearch: function () {
+        const self = this;
+        clearTimeout(this.debounce);
+        this.debounce = setTimeout(() => {
+          self.options.page = 1;
+          self.getUsers();
+        }, 500);
       }
     }
   }

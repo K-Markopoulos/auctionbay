@@ -16,8 +16,12 @@ const router = express.Router();
 
 const getAllSchema = {
   query: {
-    cursor: validator.number().optional(),
-    limit: validator.number().optional()
+    search: validator.string().optional().allow(''),
+    status: validator.string().optional().allow(''),
+    page: validator.number().optional(),
+    limit: validator.number().optional(),
+    sortBy: validator.string().optional().allow(''),
+    order: validator.string().optional().allow('')
   }
 };
 

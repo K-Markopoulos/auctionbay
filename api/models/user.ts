@@ -138,6 +138,14 @@ export const UserSchema = new mongoose.Schema<IUser>({
 // Used to populate these fields
 export const SellerSummary = 'username avatar sellerRating location';
 
+// Index for free text search
+UserSchema.index({
+  username: 'text',
+  email: 'text',
+  firstName: 'text',
+  lastName: 'text',
+});
+
 UserSchema.pre<IUser>('save', function(next) {
   this.updatedAt = new Date();
   return next();

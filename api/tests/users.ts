@@ -273,7 +273,8 @@ describe('Test users routes', function() {
       const p = await get(server, '/api/users/', adminToken);
 
       p.should.have.status(200);
-      p.body.should.be.an('array').with.length(4);
+      p.body.data.should.be.an('array').with.length(4);
+      p.body.total.should.equals(4);
     });
 
     it('should not get all users as not admin', async () => {

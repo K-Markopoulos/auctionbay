@@ -32,9 +32,55 @@ const _addAvatar = async (input: any) => {
   return files[0];
 };
 
+
+const _getQueryFilters = (input: any) => {
+  const filters = {};
+  if (input.search) {
+    filters['$text']  = {$search: input.search}
+  }
+  if (input.status) {
+    filters['status'] = input.status;
+  }
+  return filters;
+};
+
+const sortByAvailableFields = {
+  username: 'username',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  email: 'email',
+  "location.address": 'location.address',
+  "location.country" : 'location.country',
+  status: 'status',
+  createdAt: 'createdAt',
+};
+
+const _getQueryOptions = (input: any) => {
+  const page = Number(input.page) || 0;
+  const limit = Number(input.limit) || 0;
+  const sortBy = sortByAvailableFields[input.sortBy] || 'createdAt';
+  const order = input.order === 'desc' ? -1 : 1;
+
+  return {
+    skip: page * limit,
+    limit: limit,
+    sort: {
+      [sortBy]: order
+    }
+  }
+};
+
 const getAllUsers = async (input) => {
-  const users = await User.find({});
-  return users.map((user: IUser) => user.toJSON());
+  const filters = _getQueryFilters(input);
+  const options = _getQueryOptions(input);
+  console.log(filters);
+  console.log(options);
+  const users = await User.find(filters, {}, options);
+  const usersCount = await User.countDocuments(filters);
+  return {
+    data: users.map((user: IUser) => user.toJSON()),
+    total: usersCount
+  }
 };
 
 const createUser = async (input) => {
