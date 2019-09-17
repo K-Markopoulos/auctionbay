@@ -1,8 +1,6 @@
 import * as mongoose from 'mongoose';
-import helpers = require('../tests/helpers');
-import enums = require('../models/enums');
-import User, { IUser } from '../models/user';
-import Auction from '../models/auction';
+import Recommender from '../common/recommender';
+import User, { UserSchema } from '../models/user';
 
 // Connect to the database.
 const auth = process.env.MONGODB_USER || process.env.MONGODB_PASSWORD ?
@@ -21,7 +19,14 @@ mongoose.connect(uri, {
 }).then(() => {
   console.info(`System connected to the database @ ${uriwa}.`);
 }).then(async () => {
-  return createMatrix();
+  await Recommender.initialize();
+  return User.find({},'_id username').then(users => {
+    users.forEach(user => {
+      console.log('\nRecommended items for ', user.username)
+      const recommended = Recommender.recommend(user._id.toString(), 10);
+      console.log(recommended);
+    })
+  })
 }).then(() => {
   console.log('Done');
   process.exit();
@@ -29,26 +34,3 @@ mongoose.connect(uri, {
   console.error(`System failed to connect to the database @ ${uriwa}.`, error);
   process.exit();
 });
-
-const createMatrix = async () => {
-  const users = await User.find({});
-  const auctions = await Auction.find({}).populate({
-    path: 'bids.bidder',
-    select: '_id',
-    model: 'User'
-  });
-
-  let matrix = {};
-  users.forEach(user => matrix[user.id] = {});
-
-  auctions.forEach(auction => {
-    auction.bids.forEach(bid => {
-      matrix[(bid.bidder as IUser)._id] = {
-        [auction._id]: true
-      };
-      // matrix[(bid.bidder as IUser)._id][auction._id] = true;
-    });
-  });
-  console.log('-- Created Matrix --\n', JSON.stringify(matrix));
-}
-

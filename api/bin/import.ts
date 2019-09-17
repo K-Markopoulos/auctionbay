@@ -5,6 +5,7 @@ import parser = require('xml2json');
 import fs = require('fs');
 import Auction, { IAuction } from '../models/auction';
 import User, { IUser } from '../models/user';
+import Activity, { IActivity } from '../models/activity';
 
 // Connect to the database.
 const auth = process.env.MONGODB_USER || process.env.MONGODB_PASSWORD ?
@@ -95,6 +96,21 @@ mongoose.connect(uri, {
   return Auction.create(docs);
 }).then(auctions => {
   console.log(`Created ${auctions.length} auctions`);
+  const activities = [];
+  auctions.forEach(auction => {
+    auction.bids.forEach(bid => {
+      activities.push(
+        Activity.findOneAndUpdate(
+          { type: enums.Activities.BID, item: auction._id, user: bid.bidder },
+          { $inc: { count: 1 }},
+          { upsert: true }
+        ).exec()
+      )
+    })
+  })
+  return Promise.all(activities);
+}).then((activities) => {
+  console.log(`Created ${activities.length} activities`);
   console.log('Done');
   process.exit();
 }).catch((error) => {

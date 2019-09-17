@@ -14,6 +14,7 @@
     "test": "mocha --exit -r dotenv/config -r ts-node/register api/tests/*.ts",
     "seed": "node -r dotenv/config -r ts-node/register api/bin/seeder.ts",
     "import": "node -r dotenv/config -r ts-node/register api/bin/import.ts",
+    "rec": "node -r dotenv/config -r ts-node/register api/bin/test.ts",
     "build-ui": "webpack -r dotenv/config --progress --hide-modules"
   },
   "dependencies": {
