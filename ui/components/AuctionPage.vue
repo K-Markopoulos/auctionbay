@@ -447,7 +447,7 @@
       },
 
       reservedRange: function(n) {
-        return [...Array(n).keys()].slice().reverse()
+        return [...Array(n).keys()].slice(1).reverse();
       }
     }
   }

@@ -65,6 +65,12 @@ const updateAuction = {
   }
 };
 
+const exportAuctions = {
+  params: {
+    responseType: validator.string().valid('xml', 'json').required()
+  }
+};
+
 const deleteAuction = {
   params: {
     id: validator.objectId().required()
@@ -115,10 +121,11 @@ router.route('/categories').get(
 );
 
 // Export auctions
-router.route('/export').get(
+router.route('/export/:responseType').get(
   authenticate,
   guard.asAdmin(),
-  prepare(method.exportAuctions, 'xml'),
+  validate(exportAuctions),
+  prepare(method.exportAuctions),
   respond
 );
 

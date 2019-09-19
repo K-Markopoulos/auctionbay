@@ -7,7 +7,7 @@ import Login from './components/Login'
 import Registration from './components/Registration'
 import AuctionsList from './components/AuctionsList'
 import AuctionPage from './components/AuctionPage'
-import UsersList from './components/UsersList'
+import AdminPanel from './components/AdminPanel'
 import UserPage from './components/UserPage'
 import MessagesPage from './components/MessagesPage'
 
@@ -54,8 +54,8 @@ const router = new VueRouter({
       }
     },
     {
-      path: '/users',
-      component: UsersList
+      path: '/admin',
+      component: AdminPanel
     },
     {
       path: '/users/:id',

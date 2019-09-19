@@ -178,7 +178,14 @@ const exportAuctions = async (input) => {
       model: 'User'
     }
   });
-  return _createXML(auctions);
+  switch (input.responseType) {
+    case 'xml':
+      return _createXML(auctions);
+    case 'json':
+      return auctions.map(auction => auction.toJSON());
+    default:
+      throw new errors.BadRequestError('UNKNOWN_EXPORT_TYPE');
+  }
 };
 
 const updateAuction = async (input) => {

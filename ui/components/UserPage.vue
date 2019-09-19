@@ -2,7 +2,6 @@
   <v-card
   width="800"
   >
-   
     <v-avatar size="200" class="my-5">
       <v-img
         class="elevation-4"
@@ -142,7 +141,7 @@ import store from '../services/store.service';
       },
       isSameUser() {
         return this.user.id === (this.currentUser && this.currentUser.id);
-      }
+      }    
     },
     methods: {
       getUser() {

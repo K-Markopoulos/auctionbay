@@ -9,6 +9,9 @@ const prepare = (method: Function, type: string = 'json') => {
     if (req.file) {
       input.file = req.file;
     }
+    if (req.params.responseType) {
+      type = req.params.responseType;
+    }
     input.accessor = res.locals.accessor;
       return method(input).then((result) => {
         res.locals.content = result;

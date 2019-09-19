@@ -157,6 +157,40 @@ describe('Test auctions routes', function() {
     });
   });
 
+  describe('GET @ /export/:responseType', function() {
+    it('should export all auctions as xml', async () => {
+      // create 10 auctions
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
+      const p = await get(server, `/api/auctions/export/xml`, adminToken);
+
+      p.should.have.status(200);
+    });
+
+    it('should export all auctions as json', async () => {
+      // create 10 auctions
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
+      const p = await get(server, `/api/auctions/export/json`, adminToken);
+
+      p.should.have.status(200);
+    });
+
+    it('should not export all auctions for unauthorized user', async () => {
+      // create 10 auctions
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
+      const p = await get(server, `/api/auctions/export/json`, sellerToken);
+
+      p.should.have.status(403);
+    });
+
+    it('should not export all auctions as unkown type', async () => {
+      // create 10 auctions
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
+      const p = await get(server, `/api/auctions/export/pdf`, adminToken);
+
+      p.should.have.status(400);
+    });
+  });
+
   describe('PUT @ /:id', function() {
     let auction, bid;
     const changes = {

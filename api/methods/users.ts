@@ -73,8 +73,6 @@ const _getQueryOptions = (input: any) => {
 const getAllUsers = async (input) => {
   const filters = _getQueryFilters(input);
   const options = _getQueryOptions(input);
-  console.log(filters);
-  console.log(options);
   const users = await User.find(filters, {}, options);
   const usersCount = await User.countDocuments(filters);
   return {

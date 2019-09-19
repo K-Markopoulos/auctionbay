@@ -9,7 +9,7 @@
 
     <v-toolbar-items v-if="isLoggedIn()">
       <v-btn to="/auctions" text> Auctions </v-btn>
-      <v-btn to="/users" v-if="isAdmin" text> Users </v-btn>
+      <v-btn to="/admin" v-if="isAdmin" text> Admin Panel </v-btn>
       <v-icon @click="openNewAuctionForm = true">mdi-plus</v-icon>
       <v-avatar id="user-avatar" size="30">
         <v-img :src="getUserAvatar" class="elevation-1"></v-img>
