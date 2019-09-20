@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import app = require('./app');
 import ws = require('./api/common/ws-server');
+import Scheduler = require('./api/common/scheduler');
 import https = require('https');
 import fs = require('fs');
 
@@ -23,6 +24,7 @@ mongoose.connect(uri, {
   useFindAndModify: false
 }).then(() => {
   console.info(`System connected to the database @ ${uriwa}.`);
+  Scheduler.scheduleAllAuctions();
 }).catch((error) => {
   console.error(`System failed to connect to the database @ ${uriwa}.`, error);
 });

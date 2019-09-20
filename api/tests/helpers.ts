@@ -92,7 +92,7 @@ const createAuction = async (overrides?: any) => {
     bidsCount: overrides && overrides.bids && overrides.bids.length || 0,
     location: createLocation(),
     started: new Date(),
-    ends: faker.date.future(),
+    ends: faker.date.recent(-1),
     seller: mongoose.Types.ObjectId,
     description: faker.lorem.sentence(),
     images: [],

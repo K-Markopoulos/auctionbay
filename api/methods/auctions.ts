@@ -7,6 +7,7 @@ import errors = require('../common/errors');
 import Files = require('../common/files');
 import enums = require('../models/enums');
 import mongoose = require('mongoose');
+import Scheduler = require('../common/scheduler');
 
 const _validateBid = (input: any, auction: IAuction) => {
   const bid = {
@@ -58,7 +59,9 @@ const _getQueryFilters = (input: any) => {
     filters['category'] = input.category;
   }
   if (input.active) {
-    filters['ends'] = { $gt: new Date().toUTCString() }
+    filters['ends'] = { $gt: new Date() }
+    filters['lastBidder'] = null;
+    filters['buyer'] = null;
   }
   if (input.seller && mongoose.Types.ObjectId.isValid(input.seller)) {
     filters['seller'] = input.seller
@@ -134,13 +137,14 @@ const createAuction = async (input) => {
     category: input.category,
     buyPrice: input.buyPrice,
     firstBid: input.firstBid,
-    ends: input.ends,
+    ends: new Date(input.ends),
     location: input.location,
     description: input.description,
     seller: input.accessor._id
   }
   const auction = new Auction(newAuction);
   await _addImages(input, auction);
+  Scheduler.scheduleAuctionEnd(auction);
 
   console.info('Created new auction: ', auction.name);
   return (await auction.save()).toJSON();
@@ -219,6 +223,7 @@ const updateAuction = async (input) => {
 const deleteAuction = async (input) => {
   await _validateAuctionUpdate(input);
   const res = await Auction.deleteOne({ _id: input.id });
+  Scheduler.cancelJob(input.id);
   console.log('Deleted auction', input.id, res.ok, res.n);
 }
 
@@ -236,8 +241,9 @@ const buyItem = async (input) => {
     auction.buyer = input.accessor._id;
     return auction.save();
   }).then(auction => {
+    Scheduler.cancelJob(auction._id.toString());
     Message.sendNotification({
-      body: `Your item "${auction.name}" has been bought by user ${input.accessor.username}`,
+      body: `Your item "${auction.name}" has been bought by ${input.accessor.username}`,
       to: (auction.seller as any)._id
     });
     return auction.toJSON();
