@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import helpers = require('../tests/helpers');
 import enums = require('../models/enums');
+import User, { UserSchema } from '../models/user';
 
 // Connect to the database.
 const auth = process.env.MONGODB_USER || process.env.MONGODB_PASSWORD ?
@@ -18,12 +19,13 @@ mongoose.connect(uri, {
 }).then(() => {
   console.info(`System connected to the database @ ${uriwa}.`);
 }).then(async () => {
-  await mongoose.connection.collections.users.deleteMany({});
-  await mongoose.connection.collections.auctions.deleteMany({});
-  await mongoose.connection.collections.messages.deleteMany({});
-  const users = await populateUsers();
+  // await mongoose.connection.collections.users.deleteMany({});
+  // await mongoose.connection.collections.auctions.deleteMany({});
+  // await mongoose.connection.collections.messages.deleteMany({});
+  // const users = await populateUsers();
+  const users = await User.find({});
   const auctions = await populateAuctions(users);
-  const messages = await populateMessages(users);
+  // const messages = await populateMessages(users);
 }).then(() => {
   console.log('Done');
   process.exit();
@@ -68,6 +70,9 @@ const populateUsers = async () => {
 };
 
 const populateAuctions = async (users) => {
+  const now = new Date();
+  const r = () => Math.ceil(Math.random() * 10);
+  // ends: new Date(now.getTime() + r()*60000) } // ends in next minutes
   return Promise.all([
     // create Auctions
     ...[...Array(30)].map((x,i) => helpers.createAuction({ seller: users[i % users.length]._id })),

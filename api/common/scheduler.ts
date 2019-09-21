@@ -44,7 +44,7 @@ async function onAuctionEnd(id: string, date: Date) {
   // };
   // WS.notifyAll(announcement);
 
-  const auction = await Auction.findById(id, 'seller buyer bids').populate('buyer bids.bidder');
+  const auction = await Auction.findById(id, 'name seller buyer bids').populate('buyer bids.bidder');
   const winner = ((auction.bids[0] && auction.bids[0].bidder) as IUser);
 
   if (winner) {
@@ -56,7 +56,7 @@ async function onAuctionEnd(id: string, date: Date) {
     });
     Messages.sendNotification({
       body: `You just won the auction '${auction.name}'!`,
-      to: auction.seller
+      to: winner
     });
 
     return auction.save();
