@@ -4,6 +4,7 @@ import bcrypt = require('bcrypt');
 import tokens = require('../common/tokens');
 import enums = require('../models/enums');
 import Files = require('../common/files');
+import Messages = require('./messages');
 
 const _validate = async (user: IUser): Promise<IUser> => {
   const sameEmailUser = await User.findOne({ email: user.email });
@@ -122,16 +123,30 @@ const updateUser = async (input) => {
 };
 
 const approveUsers = async (input) => {
-  const res = await User.updateMany(
+  const users = await User.find(
     { _id: { $in: input.users }},
-    { status: enums.Status.APPROVED },
-    { multi: true }
+    'status'
   );
-  return res;
+  const pendingUsers = users.filter(u => u.status === enums.Status.PENDING);
+  pendingUsers.forEach(user => {
+    user.status = enums.Status.APPROVED;
+    user.save();
+    Messages.sendNotification({
+      to: user._id,
+      body: 'Your registration has been approved by administrator.'
+    });
+  })
+  
+  return {
+    n:  users.length,
+    nModified: pendingUsers.length,
+    ok: 1
+  };
 };
 
 const deleteUser = async (input) => {
   const user = await User.findByIdAndRemove(input.id);
+  return {};
 };
 
 const authenticateUser = async (input) => {

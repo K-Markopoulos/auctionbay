@@ -11,7 +11,7 @@ const handle = (error: Error, _req: Request, res: Response, _next: NextFunction)
       break;
     case 'ForbiddenError':
       status = 403;
-      errorMsg = 'ACCESS_DENIED';
+      errorMsg = error.message || 'ACCESS_DENIED';
       break;
     case 'NotFoundError':
       status = 404;

@@ -6,7 +6,6 @@ import guard = require('../middlewares/guards');
 import respond = require('../middlewares/respond');
 import method = require('../methods/messages');
 import prepare = require('../middlewares/prepare');
-import upload = require('../middlewares/multipart');
 
 const router = express.Router();
 
@@ -50,6 +49,7 @@ router.route('/count').get(
 // Create message
 router.route('/').post(
   authenticate,
+  guard.asApproved(),
   validate(createSchema),
   prepare(method.sendMessage),
   respond

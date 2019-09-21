@@ -33,6 +33,7 @@ const tr = {
   'NOT_WINNER': 'You have to win or buy the item in order to rate it.',
   'UNKNOWN_AUCTION': 'Couldn\'t find the auction you requested.',
   'ALREADY_RATED': 'You have already rated this auction.',
+  'PENDING': 'Your registration is still pending. You have to be approved to perform this action.',
   'VALIDATION_FAILED': 'The request is malformed.'
 }
 

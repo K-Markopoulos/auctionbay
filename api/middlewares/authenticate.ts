@@ -33,11 +33,14 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
   }
   return User.findById(payload._id).then((user: IUser) => {
     if (!user) {
-      return next(new errors.UnauthorizedError());    
+      return next(new errors.UnauthorizedError());
     }
     // authenticated
     res.locals.accessor = user;
     return next();
+  }).catch(err => {
+    console.log('Failed to authenticate:', err);
+    throw err;
   })
 };
 

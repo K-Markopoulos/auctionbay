@@ -3,6 +3,7 @@ import { Request, Response, NextFunction} from 'express';
 import User, { IUser } from '../models/user';
 import Enums = require('../models/enums');
 import Auction from '../models/auction';
+import enums = require('../models/enums');
 
 const asRole = (roles: string[]) => {
   return async (_req: Request, res: Response, next: NextFunction) => {
@@ -79,10 +80,22 @@ const asSelfOrAdmin = () => {
   };
 };
 
+const asApproved = () => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const user = await User.findById(res.locals.accessor._id, 'status');
+    if (user.status !== enums.Status.APPROVED) {
+      console.info(`User '${user.username}' is not APPROVED, status:${user.status}`);
+      return next(new errors.ForbiddenError('PENDING'));
+    }
+    next();
+  };
+};
+
 export = {
   asRole,
   asSelf,
   asOwner,
   asAdmin,
-  asSelfOrAdmin
+  asSelfOrAdmin,
+  asApproved
 }

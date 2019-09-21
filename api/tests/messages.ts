@@ -19,7 +19,6 @@ describe('Test message routes', function() {
   beforeEach(async () => {
     // delete all messages before each test
     await mongoose.connection.collections.messages.deleteMany({});
-    await mongoose.connection.collections.users.findAndModify({},{},{ messages: [] });
   })
 
   describe('POST @ /', function(){
