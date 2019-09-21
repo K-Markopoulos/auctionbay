@@ -112,6 +112,14 @@ router.route('/').get(
   respond
 );
 
+// Get all auctions
+router.route('/recommend').get(
+  authenticate,
+  validate({}),
+  prepare(method.getRecommended),
+  respond
+);
+
 // Create new auction
 router.route('/').post(
   authenticate,

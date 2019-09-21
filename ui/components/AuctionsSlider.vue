@@ -10,6 +10,9 @@
         </div>
       </v-flex>
     </v-layout>
+    <div v-if="!this.auctions || this.auctions.length === 0">
+      <h2 class="grey lighten-4 no-data">No data</h2>
+    </div>
   </v-card>
 </template>
 
@@ -39,7 +42,11 @@ import AuctionCard from './AuctionCard';
         order: '',
         ...this.config
       };
-      this.getAuctions();
+      if (this.filters.recommended) {
+        this.getRecommended();
+      } else {
+        this.getAuctions();
+      }
     },
     
     methods: {
@@ -58,6 +65,15 @@ import AuctionCard from './AuctionCard';
           console.log('Failed to fetch auctions');
         });
       },
+
+      getRecommended: function() {
+        ApiService.get('/auctions/recommend').then(res => {
+          this.auctions = res.data;
+          console.log(this.acutions);
+        }).catch(err => {
+          console.log('Failed to fetch recommended auctions');
+        });
+      },
     }
   }
 </script>
@@ -65,5 +81,12 @@ import AuctionCard from './AuctionCard';
 <style>
 .horizontal-scroll {
   overflow-x: auto;
+}
+.no-data {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: x-large;
 }
 </style>

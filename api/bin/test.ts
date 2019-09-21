@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import Recommender from '../common/recommender';
+import Recommender = require('../common/recommender');
 import User, { UserSchema } from '../models/user';
 
 // Connect to the database.

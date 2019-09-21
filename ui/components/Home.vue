@@ -8,8 +8,8 @@
     </v-parallax>
     <div class="mx-10">
       <auctions-slider :config="{ active: 1, sortBy: 'ends', order: 'asc' }">Closing soon</auctions-slider>
-      <auctions-slider :config="{ active: 1, sortBy: 'bidsCount', order: 'desc' }">Trending</auctions-slider>
-      <auctions-slider>Picked for you (not really)</auctions-slider>
+      <auctions-slider :config="{ active: 1, sortBy: 'bidsCount', order: 'desc' }">Most bids</auctions-slider>
+      <auctions-slider :config="{ recommended: 1 }" v-if="isLoggedin">You may also like</auctions-slider>
     </div>
   </div>
 </template>
@@ -37,6 +37,9 @@
     },
 
     computed: {
+      isLoggedin() {
+        return !!store.state.user;
+      },
       categories() {
         return store.state.categories;
       },

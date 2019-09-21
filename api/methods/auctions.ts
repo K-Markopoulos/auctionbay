@@ -8,6 +8,7 @@ import Files = require('../common/files');
 import enums = require('../models/enums');
 import mongoose = require('mongoose');
 import Scheduler = require('../common/scheduler');
+import Recommender = require('../common/recommender');
 
 const _validateBid = (input: any, auction: IAuction) => {
   const bid = {
@@ -192,6 +193,13 @@ const getAllAuctions = async (input) => {
   }
 };
 
+const getRecommended = async (input) => {
+  const ids = Recommender.recommend(input.accessor._id, 10);
+  console.log(ids);
+  const auctions =  await Auction.find({ _id: { $in: ids }}).populate('seller', SellerSummary);
+  return auctions.map(auction => auction.toJSON());
+};
+
 const exportAuctions = async (input) => {
   const auctions = await Auction.find({}).populate({
     path: 'seller bids',
@@ -309,6 +317,7 @@ export = {
   getAuction,
   getCategories,
   getAllAuctions,
+  getRecommended,
   updateAuction,
   deleteAuction,
   placeBid,

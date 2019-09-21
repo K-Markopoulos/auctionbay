@@ -28,7 +28,7 @@ const createMatrix = async () => {
         [enums.Activities.BID]: Object.assign({}, auctions)
       };
       user.items.forEach(item => {
-        data[user._id][item.type][item._id] = item.count
+        data[user._id][item.type][item.item] = item.count
       })
     });
     console.log(data);
@@ -40,7 +40,7 @@ const initialize = async (reset: boolean = true) => {
   if (reset) {
     matrix = await createMatrix();
     users = Object.keys(matrix);
-    createRandomProjections(10, getFeatureSize(users, matrix));
+    createRandomProjections(4, getFeatureSize(users, matrix));
   }
 
   users.forEach(user => {
@@ -99,12 +99,18 @@ const recommend = (user: string, N: number) => {
     }
   }).sort((a, b) => b.rank - a.rank).map(u => u.user);
 
+  const lookup = {};
   for(let u of rankedNeighbors) {
     Object.keys(matrix[u][enums.Activities.BID])
       .filter(item => matrix[u][enums.Activities.BID][item] && !matrix[user][enums.Activities.BID][item])
       .map(item => { return { item: item, count: matrix[u][enums.Activities.BID][item] }})
       .sort((a,b) => b.count - a.count)
-      .forEach(item => recommended.push(item.item))
+      .forEach(item => {
+        if (!lookup[item.item]) {
+          recommended.push(item.item);
+          lookup[item.item] = true;
+        }
+      });
     if (recommend.length > N) break;
   }
   return recommended.slice(0, N);
@@ -202,7 +208,7 @@ const getSimilarUsers = (user, users, matrix) => {
   });
 };
 
-export default {
+export = {
   initialize,
   recommend,
   insertItem,

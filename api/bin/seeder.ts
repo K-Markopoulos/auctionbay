@@ -1,7 +1,9 @@
 import * as mongoose from 'mongoose';
 import helpers = require('../tests/helpers');
 import enums = require('../models/enums');
-import User, { UserSchema } from '../models/user';
+import User, { UserSchema, IUser } from '../models/user';
+import { IAuction } from '../models/auction';
+import activity from '../models/activity';
 
 // Connect to the database.
 const auth = process.env.MONGODB_USER || process.env.MONGODB_PASSWORD ?
@@ -19,13 +21,15 @@ mongoose.connect(uri, {
 }).then(() => {
   console.info(`System connected to the database @ ${uriwa}.`);
 }).then(async () => {
-  // await mongoose.connection.collections.users.deleteMany({});
-  // await mongoose.connection.collections.auctions.deleteMany({});
-  // await mongoose.connection.collections.messages.deleteMany({});
-  // const users = await populateUsers();
-  const users = await User.find({});
+  await mongoose.connection.collections.users.deleteMany({});
+  await mongoose.connection.collections.auctions.deleteMany({});
+  await mongoose.connection.collections.messages.deleteMany({});
+  await mongoose.connection.collections.activities.deleteMany({});
+  const users = await populateUsers();
+  // const users = await User.find({});
   const auctions = await populateAuctions(users);
-  // const messages = await populateMessages(users);
+  const messages = await populateMessages(users);
+  const activities = await populateActivities(users, auctions);
 }).then(() => {
   console.log('Done');
   process.exit();
@@ -80,6 +84,7 @@ const populateAuctions = async (users) => {
     all.forEach(auction => {
       console.log(`Created Auction: ${auction.name}'`);
     });
+    return all;
   });
 };
 
@@ -107,5 +112,37 @@ const populateMessages = async (users) => {
     all.forEach(message => {
       console.log(`Created Message: ${message.id}\n\tFrom: ${message.from && message.from._id}\n\tTo: ${message.to._id}'`);
     });
+    return all;
+  });
+};
+
+const populateActivities = async (users: IUser[], auctions: IAuction[]) => {
+  let activities = [];
+
+  users.forEach(user => auctions.forEach(auction => {
+
+    // 10% chance user has bid on this auction
+    // else 60% chance user has visited this auction
+    if (Math.random() < 0.1) {
+      activities.push({
+        type: enums.Activities.BID,
+        item: auction._id,
+        user: user._id,
+        count: Math.ceil(Math.random()*2) // 1 or 2
+      });
+    } else if (Math.random() < 0.6) {
+      const r = Math.ceil(Math.random()*10);
+      activities.push({
+        type: enums.Activities.VISIT,
+        item: auction._id,
+        user: user._id,
+        count: r*r
+      });
+    }
+
+  }));
+  return activity.create(activities).then(all => {
+    console.log(`Created ${all.length} Activities`);
+    return all;
   });
 };

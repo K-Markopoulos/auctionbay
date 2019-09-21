@@ -2,6 +2,7 @@ import * as mongoose from 'mongoose';
 import app = require('./app');
 import ws = require('./api/common/ws-server');
 import Scheduler = require('./api/common/scheduler');
+import Recommender = require('./api/common/recommender');
 import https = require('https');
 import fs = require('fs');
 
@@ -46,6 +47,9 @@ if (!module.parent) {
   // Start WebSocket server
   ws.mount(server);
   ws.start();
+
+  // start recommender
+  Recommender.initialize();
 }
 
 export = app;
