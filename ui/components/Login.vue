@@ -45,6 +45,7 @@
   import ApiService from '../services/api.service';
   import TokenService from '../services/token.service';
   import store from '../services/store.service';
+  import WS from '../services/websocker.service';
 
   export default {
     name: 'Login',
@@ -77,6 +78,7 @@
         TokenService.saveToken(res.data.token);
         TokenService.saveUserID(res.data.id);
         ApiService.setHeader();
+        WS.connect();
         console.log('Logged in');
         
         // get notifications count

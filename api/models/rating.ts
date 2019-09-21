@@ -38,6 +38,7 @@ export const RatingSchema = new mongoose.Schema<IRating> ({
 });
 
 export const DefaultRatingSchema: IRating = {
+  1: 0,
   2: 0,
   3: 0,
   4: 0,

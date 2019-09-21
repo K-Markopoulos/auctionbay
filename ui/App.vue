@@ -118,7 +118,7 @@ export default {
       TokenService.removeUserID();
       store.commit('logout');
       WS.disconnect();
-      this.$router.push('/login');
+      this.$router.push('/');
     },
 
     closeDialog() {

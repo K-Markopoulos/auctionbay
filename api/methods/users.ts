@@ -111,12 +111,11 @@ const updateUser = async (input) => {
   if (changes.email) {
     await _validateNewEmail(input);
   }
-  console.log(input);
+
   const avatar = await _addAvatar(input);
   if (avatar) {
     changes.avatar = avatar;
   }
-  console.log('Avatar', avatar);
   const user = await User.findByIdAndUpdate(input.id, changes, { new: true });
   console.info('Updated user ', user.username);
   return user.toJSON();

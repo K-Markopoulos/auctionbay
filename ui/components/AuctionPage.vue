@@ -26,8 +26,21 @@
       <span class="action-helper action-button">You have won this auction!</span>
       <v-btn 
         @click="contactSeller"
-        text outlined color="primary" class="action-button"
+        text outlined color="primary" class="action-button mr-10"
       >Contact seller</v-btn>
+      <v-rating
+        background-color="orange lighten-3"
+        color="orange"
+        v-model="rating"
+        hover
+        :readonly="auction.rating"
+      ></v-rating>
+      <v-btn
+        v-if="!auction.rating"
+        :disabled="!rating"
+        @click="submitRating"
+        text outlined color="primary" class="action-button"
+      >Rate now</v-btn>
     </div>
 
     <message-box v-if="showMessageBox" v-bind="messageProps"></message-box>
@@ -290,6 +303,7 @@
         ],
         imgIndex: 0,
         noMap: false,
+        rating: null
       }
     },
 
@@ -348,6 +362,7 @@
         ApiService.get(`/auctions/${this.id}`).then(res => {
           this.loading = false;
           this.auction = res.data;
+          this.rating = this.auction.rating;
           this.imgIndex = 0;
 
           this.loadMap();
@@ -403,6 +418,12 @@
         ApiService.post(`/auctions/${this.id}/buy`, {}).then(res => {
           this.auction = res.data;
           this.buyConfirmDialog = false;
+        }).catch(err => console.log(err));
+      },
+
+      submitRating: function() {
+        ApiService.post(`/auctions/${this.id}/rate`, {rating: this.rating}).then(res => {
+          this.auction = res.data;
         }).catch(err => console.log(err));
       },
 

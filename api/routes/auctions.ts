@@ -92,6 +92,14 @@ const buyItem = {
   }
 };
 
+const rateItem = {
+  params: {
+    id: validator.objectId().required()
+  },
+  body: {
+    rating: validator.number().min(1).max(5).required()
+  }
+};
 
 //
 // Routes
@@ -172,6 +180,15 @@ router.route('/:id/buy').post(
   guard.asRole([enums.Role.REGISTERED, enums.Role.ADMINISTRATOR]),
   validate(buyItem),
   prepare(method.buyItem),
+  respond
+);
+
+// Rate the item
+router.route('/:id/rate').post(
+  authenticate,
+  guard.asRole([enums.Role.REGISTERED, enums.Role.ADMINISTRATOR]),
+  validate(rateItem),
+  prepare(method.rateItem),
   respond
 );
 export = router;

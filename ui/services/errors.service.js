@@ -1,4 +1,5 @@
 import TokenService from './token.service';
+import Store from './store.service';
 import router from '../router'
 
 toastr.options = {
@@ -29,6 +30,9 @@ const tr = {
   'EMAIL_ALREADY_EXISTS': '',
   'USERNAME_ALREADY_EXISTS': '',
   'FILE_TOO_LARGE': 'Files should not be larger than 2MB.',
+  'NOT_WINNER': 'You have to win or buy the item in order to rate it.',
+  'UNKNOWN_AUCTION': 'Couldn\'t find the auction you requested.',
+  'ALREADY_RATED': 'You have already rated this auction.',
   'VALIDATION_FAILED': 'The request is malformed.'
 }
 
@@ -40,7 +44,8 @@ const Errors = {
       case 401:
         TokenService.removeToken();
         TokenService.removeUserID();
-        router.push('login');
+        Store.commit('setUser', null);
+        router.push('/login');
         break;
       case 400:
       case 403:
@@ -52,7 +57,7 @@ const Errors = {
   },
 
   showError(error_code) {
-    toastr.error(tr[error_code]|| 'Ops that didn\'t work');
+    toastr.error(tr[error_code]|| 'Ops, that didn\'t work');
   },
 };
 

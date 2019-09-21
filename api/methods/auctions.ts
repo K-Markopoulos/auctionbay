@@ -39,7 +39,7 @@ const _validatePurchase = (auction: IAuction) => {
   if (auction.buyer || auction.lastBidder || auction.ends < new Date()) {
     throw new errors.BadRequestError('AUCTION_CLOSED');
   }
-}
+};
 
 const _validateAuctionUpdate = async (input) => {
   const auction = await Auction.findById(input.id);
@@ -48,7 +48,25 @@ const _validateAuctionUpdate = async (input) => {
     throw new errors.BadRequestError('CANNOT_MODIFY');
   }
   return auction;
-}
+};
+
+const _validateRate = (auction: IAuction, input: any) => {
+  if (!auction) {
+    console.info(`Couldn't find auction '${input.id}' to rate`);
+    throw new errors.NotFoundError('UNKNOWN_AUCTION');
+  }
+  if (auction.rating) {
+    throw new errors.BadRequestError('ALREADY_RATED');
+  }
+  if (
+    input.accessor._id.equals(auction.buyer) ||
+    input.accessor._id.equals(auction.lastBidder)
+  ) {
+    return;
+  } else {
+    throw new errors.ForbiddenError('NOT_WINNER');
+  }
+};
 
 const _getQueryFilters = (input: any) => {
   const filters = {};
@@ -253,6 +271,38 @@ const buyItem = async (input) => {
   })
 };
 
+const _rateUser = async (userID: mongoose.Types.ObjectId, rating: number)=> {
+  const user = await User.findById(userID);
+  user.sellerRating[rating] += 1;
+  user.sellerRating.avg = (
+      user.sellerRating[1] + 2*user.sellerRating[2] +
+      3*user.sellerRating[3] + 4*user.sellerRating[4] +
+      5*user.sellerRating[5]
+    ) / (
+      user.sellerRating[1] + user.sellerRating[2] +
+      user.sellerRating[3] + user.sellerRating[4] + user.sellerRating[5]
+    );
+  user.sellerRating.avg = Math.round(user.sellerRating.avg * 10) / 10;
+  return user.save();
+};
+
+const rateItem = async (input) => {
+  return Auction.findById(input.id).then(async auction => {
+    _validateRate(auction, input);
+    auction.rating = input.rating;
+    await auction.save();
+    await _rateUser(auction.seller as mongoose.Types.ObjectId, input.rating);
+    return Auction.populate<IAuction>(auction, { path: 'seller', select: SellerSummary});
+  }).then(auction => {
+    Message.sendNotification({
+      body: `User ${input.accessor.username} rated your item "${auction.name}" with ${auction.rating} stars.`,
+      to: (auction.seller as any)._id
+    });
+    return auction.toJSON();
+  })
+};
+
+
 export = {
   createAuction,
   exportAuctions,
@@ -262,5 +312,6 @@ export = {
   updateAuction,
   deleteAuction,
   placeBid,
-  buyItem
+  buyItem,
+  rateItem
 }

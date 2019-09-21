@@ -6,6 +6,7 @@ import helpers = require('./helpers');
 import tokens = require('../common/tokens');
 import enums = require('../models/enums');
 import users = require('../methods/users');
+import { DefaultRatingSchema } from '../models/rating';
 
 const auctionData = {
   name: faker.commerce.productName(),
@@ -300,6 +301,80 @@ describe('Test auctions routes', function() {
 
       p.should.have.status(400);
       p.body.error.should.equals('AUCTION_CLOSED');
+    });
+  });
+
+  describe('POST @ /:id/rate', function() {
+    it('should rate a bought auction', async () => {
+      const auction = await helpers.createAuction({ seller, buyer: bidder._id });
+      const data = { rating: 4 };
+      const p = await post(server, `/api/auctions/${auction._id}/rate`, data, bidderToken);
+
+      p.should.have.status(200);
+    });
+
+    it('should rate a won auction', async () => {
+      const auction = await helpers.createAuction({ seller, lastBidder: bidder._id });
+      const data = { rating: 4 };
+      const p = await post(server, `/api/auctions/${auction._id}/rate`, data, bidderToken);
+
+      p.should.have.status(200);
+    });
+
+    it('should update seller rating when rating an auction', async () => {
+      const seller = await helpers.createUser({ role: enums.Role.REGISTERED, sellerRating: DefaultRatingSchema });
+      const auction = await helpers.createAuction({ seller, lastBidder: bidder._id });
+      const data = { rating: 5 };
+      const p = await post(server, `/api/auctions/${auction._id}/rate`, data, bidderToken);
+
+      p.should.have.status(200);
+      p.body.seller.sellerRating.avg.should.equal(data.rating);
+    });
+
+    it('should not rate an already rated auction', async () => {
+      const auction = await helpers.createAuction({ seller, lastBidder: bidder._id, rating: 5 });
+      const data = { rating: 3 };
+      const p = await post(server, `/api/auctions/${auction._id}/rate`, data, bidderToken);
+
+      p.should.have.status(400);
+    });
+
+    it('should not rate a auction with invalid rating', async () => {
+      const auction = await helpers.createAuction({ seller, lastBidder: bidder._id });
+      const data = { rating: 6 };
+      const p = await post(server, `/api/auctions/${auction._id}/rate`, data, bidderToken);
+
+      p.should.have.status(400);
+    });
+
+    it('should not rate an invalid auction', async () => {
+      const data = { rating: 3 };
+      const p = await post(server, `/api/auctions/unknown-id/rate`, data, bidderToken);
+
+      p.should.have.status(400);
+    });
+
+    it('should not rate an unknown auction', async () => {
+      const data = { rating: 3 };
+      const id = mongoose.Types.ObjectId()
+      const p = await post(server, `/api/auctions/${id}/rate`, data, bidderToken);
+
+      p.should.have.status(404);
+    });
+
+    it('should not rate a auction with missing rating', async () => {
+      const auction = await helpers.createAuction({ seller, lastBidder: bidder._id });
+      const p = await post(server, `/api/auctions/${auction._id}/rate`, {}, bidderToken);
+
+      p.should.have.status(400);
+    });
+
+    it('should not rate a auction without winning it', async () => {
+      const auction = await helpers.createAuction({ seller, lastBidder: bidder._id });
+      const data = { rating: 4 };
+      const p = await post(server, `/api/auctions/${auction._id}/rate`, data, sellerToken);
+      console.log(p.body);
+      p.should.have.status(403);
     });
   });
 });

@@ -47,6 +47,7 @@ export interface IAuction extends mongoose.Document{
   seller: IUser | mongoose.Types.ObjectId,
   buyer: IUser | mongoose.Types.ObjectId,
   lastBidder: IUser | mongoose.Types.ObjectId,
+  rating: number,
   description: String,
   images?: IFile[]
 }
@@ -128,6 +129,9 @@ const AuctionSchema = new mongoose.Schema<IAuction>({
     default: null
   },
 
+  // The rating given by the auction winner
+  rating: Number,
+
   // The item's description
   description: {
     type: String,
@@ -155,6 +159,7 @@ AuctionSchema.methods.toJSON = function() {
     seller: this.seller,
     buyer: this.buyer,
     lastBidder: this.lastBidder,
+    rating: this.rating,
     description: this.description,
     images: this.images || []
   };
