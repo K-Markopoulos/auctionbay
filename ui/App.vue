@@ -2,7 +2,9 @@
 <v-app>
   <v-app-bar dark>
     <v-toolbar-title style="cursor:pointer">
-      <router-link tag="span" to="/">Auction Bay</router-link>
+      <v-avatar tile size="200">
+          <v-img height="50" :src="getLogo"></v-img>
+      </v-avatar>
     </v-toolbar-title>
 
     <v-spacer></v-spacer>
@@ -94,6 +96,10 @@ export default {
       return this.user.avatar &&
         `/uploads/${this.user.avatar.fid}`||
         this.$defaultAvatar;
+    },
+
+    getLogo() {
+      return '/assets/auctionbay-logo.png';
     },
 
     isAdmin() {
