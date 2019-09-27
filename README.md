@@ -5,14 +5,6 @@
 - Node v12.6.0
 - npm v6.10.1
 
-## TLDR;
-
-```bash
-$ npm install
-$ npm run server  # backend
-$ npm run ui      # frontend
-```
-
 ## Build
 
 ```bash
