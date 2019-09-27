@@ -1,6 +1,6 @@
 import fs = require('fs');
 import xml = require('xmlbuilder');
-import User, { IUser, SellerSummary }from '../models/user';
+import User, { IUser, SellerSummary, BidderSummary }from '../models/user';
 import Auction, { IAuction, IBid }from '../models/auction';
 import Message = require('./messages');
 import errors = require('../common/errors');
@@ -170,7 +170,9 @@ const createAuction = async (input) => {
 };
 
 const getAuction = async (input) => {
-  const auction = await Auction.findById(input.id).populate('seller', SellerSummary);
+  const auction = await Auction.findById(input.id)
+    .populate('seller', SellerSummary)
+    .populate('buyer lastBidder', BidderSummary);
   if (!auction) {
     console.info(`Auction with id ${input.id} not found`);
     throw new errors.NotFoundError();

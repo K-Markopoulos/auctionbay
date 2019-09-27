@@ -85,6 +85,7 @@ const getAllUsers = async (input) => {
 const createUser = async (input) => {
   const user = await _validate(new User(input));
   user.password = bcrypt.hashSync(input.password, 10);
+  user.role = enums.Role.REGISTERED;
   console.info('Created new user: ', user.username);
   return (await user.save()).toJSON();
 };

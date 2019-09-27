@@ -137,6 +137,7 @@ export const UserSchema = new mongoose.Schema<IUser>({
 
 // Used to populate these fields
 export const SellerSummary = 'username avatar sellerRating location';
+export const BidderSummary = 'username avatar bidderRating location';
 
 // Index for free text search
 UserSchema.index({

@@ -9,7 +9,7 @@ const WS = new Vue({
 
   methods: {
     connect() {
-      this.ws = new WebSocket('wss://localhost:8888');
+      this.ws = new WebSocket(process.env.WS_BASE_URL);
 
       this.ws.onopen = (connection) => {
         const data = {

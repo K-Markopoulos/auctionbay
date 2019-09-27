@@ -10,7 +10,7 @@ import WS from './services/websocker.service'
 Vue.prototype.$defaultAvatar = '/assets/user-avatar.png';
 
 // Set the base URL of the API
-ApiService.init('https://localhost:8888/api');
+ApiService.init(process.env.API_BASE_URL);
 
 // Fetch available categories for auctions
 ApiService.get('/auctions/categories').then(res => {
