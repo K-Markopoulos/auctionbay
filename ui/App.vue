@@ -2,9 +2,11 @@
 <v-app>
   <v-app-bar dark>
     <v-toolbar-title style="cursor:pointer">
-      <v-avatar tile size="200">
-          <v-img height="50" :src="getLogo"></v-img>
-      </v-avatar>
+      <router-link to="/">
+        <v-avatar tile size="200">
+            <v-img height="50" :src="getLogo"></v-img>
+        </v-avatar>
+      </router-link>
     </v-toolbar-title>
 
     <v-spacer></v-spacer>

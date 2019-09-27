@@ -40,7 +40,7 @@ const createBid = (overrides?: any) => {
 
 const createUser = async (overrides?: any) => {
   const details = {
-    username: faker.random.word(),
+    username: faker.lorem.word(),
     email: faker.internet.email(),
     password: 'Ultra_secret',
     firstName: faker.name.findName(),

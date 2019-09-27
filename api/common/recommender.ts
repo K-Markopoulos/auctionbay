@@ -31,7 +31,6 @@ const createMatrix = async () => {
         data[user._id][item.type][item.item] = item.count
       })
     });
-    console.log(data);
     return data;
   })
 };
@@ -48,9 +47,8 @@ const initialize = async (reset: boolean = true) => {
     userHashes.set(user, hash);
     hashTable[hash] = hashTable[hash] || [];
     hashTable[hash].push(user);
-    console.log('User ', user, ' - ', hash);
   })
-  console.log('Hash table buckets: ', Object.keys(hashTable));
+  console.info('Hash table buckets: ', Object.keys(hashTable));
 };
 
 const insertActivity = (user:string, item:string, activity: number) => {
@@ -79,7 +77,7 @@ const insertItem = (item: string) => {
 
 const recommend = (user: string, N: number) => {
   if (!matrix[user]) {
-    console.log('No activity found for user ', user);
+    // console.log('No activity found for user ', user);
     return [];
   }
   const hash = getLSHash(user);
@@ -87,10 +85,9 @@ const recommend = (user: string, N: number) => {
   let recommended = [];
 
   if (!similarUsers) {
-    console.log('No similar users found for', user);
+    // console.log('No similar users found for', user);
     return [];
   }
-  console.log('Similar users: ', similarUsers);
 
   const rankedNeighbors = similarUsers.map(u => {
     return {
@@ -184,29 +181,6 @@ const fillRandom = (len: number) => {
   return Array(len).fill(0).map(x => 2*Math.random()-1);
 };
 
-const getSimilarUsers = (user, users, matrix) => {
-  console.log('Similar users for ', user);
-  console.log('\nVisits-visits:');
-  users.forEach(u => {
-    const sim = cosineSimilarity(Object.values(matrix[user]['0']), Object.values(matrix[u]['0']));
-    console.log(u, ' : ', sim);
-  });
-  console.log('\nBids-Bids:');
-  users.forEach(u => {
-    const sim = cosineSimilarity(Object.values(matrix[user]['1']), Object.values(matrix[u]['1']));
-    console.log(u, ' : ', sim);
-  });
-  console.log('\nBids-Visits:');
-  users.forEach(u => {
-    const sim = cosineSimilarity(Object.values(matrix[user]['1']), Object.values(matrix[u]['0']));
-    console.log(u, ' : ', sim);
-  });
-  console.log('\nVisits-Bids:');
-  users.forEach(u => {
-    const sim = cosineSimilarity(Object.values(matrix[user]['0']), Object.values(matrix[u]['1']));
-    console.log(u, ' : ', sim);
-  });
-};
 
 export = {
   initialize,

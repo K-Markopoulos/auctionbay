@@ -70,6 +70,9 @@ const router = new VueRouter({
       path: '*',
       component: {
         template: '<div>Ops, not found</div>'
+      },
+      meta: {
+        public: true,
       }
     },
   ],
