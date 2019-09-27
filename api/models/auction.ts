@@ -144,6 +144,17 @@ const AuctionSchema = new mongoose.Schema<IAuction>({
   ]
 });
 
+// Index for free text search
+AuctionSchema.index({
+  name: 'text',
+  description: 'text'
+}, {
+  weights: {
+    name: 5,
+    description: 1,
+  }
+});
+
 AuctionSchema.methods.toJSON = function() {
   return {
     id: this.id,

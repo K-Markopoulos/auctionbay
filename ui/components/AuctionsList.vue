@@ -90,7 +90,7 @@
     methods: {
       getAuctions: function() {
         this.loading = true;
-        const query = `page=${this.page - 1}&limit=${this.limit}&name=${this.searchQuery}&category=${this.searchCategory}`;
+        const query = `page=${this.page - 1}&limit=${this.limit}&search=${this.searchQuery}&category=${this.searchCategory}`;
 
         ApiService.get(`/auctions?${query}`).then(this.onSuccess).catch(this.onError);
       },

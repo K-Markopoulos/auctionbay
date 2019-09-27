@@ -71,8 +71,8 @@ const _validateRate = (auction: IAuction, input: any) => {
 
 const _getQueryFilters = (input: any) => {
   const filters = {};
-  if (input.name) {
-    filters['name'] = new RegExp(input.name, 'i');
+  if (input.search) {
+    filters['$text']  = {$search: input.search}
   }
   if (input.category) {
     filters['category'] = input.category;

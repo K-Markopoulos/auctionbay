@@ -18,7 +18,7 @@ const router = express.Router();
 
 const getAll = {
   query: {
-    name: validator.string().optional().allow(''),
+    search: validator.string().optional().allow(''),
     category: validator.string().optional().allow(''),
     page: validator.number().optional(),
     limit: validator.number().optional()

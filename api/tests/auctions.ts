@@ -147,8 +147,8 @@ describe('Test auctions routes', function() {
     it('should get a page of auctions by name', async () => {
       // create 10 auctions
       await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller })));
-      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller, name: 'SomethingRare'+faker.random.word() })));
-      const query = `name=SomethingRare&page=1&limit=6`;
+      await Promise.all([...Array(10)].map(() => helpers.createAuction({ seller: seller, name: 'SomethingRare '+faker.random.word() })));
+      const query = `search=SomethingRare&page=1&limit=6`;
       const p = await get(server, `/api/auctions/?${query}`, sellerToken);
 
       // console.log(p.body.data);
